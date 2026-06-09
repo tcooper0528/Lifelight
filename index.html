@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Scripture Learning Games — ESV</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Source+Sans+3:wght@300;400;600&display=swap');
@@ -115,7 +115,7 @@ body{font-family:'Source Sans 3','Segoe UI',Arial,sans-serif,'Segoe UI',Arial,sa
 .next-row{display:flex;gap:0.6rem;justify-content:center;margin-top:0.75rem;flex-wrap:wrap;}
 
 /* WORD SEARCH */
-#ws-grid{display:inline-grid;gap:0;user-select:none;border:2px solid var(--navy);border-radius:8px;overflow:hidden;}
+#ws-grid{display:inline-grid;gap:0;user-select:none;border:2px solid var(--navy);border-radius:8px;overflow:hidden;touch-action:none;-webkit-user-select:none;-ms-user-select:none;}
 .ws-cell{width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-family:'Source Sans 3','Segoe UI',Arial,sans-serif,'Segoe UI',Arial,sans-serif;font-size:0.8rem;font-weight:600;background:var(--white);border:0.5px solid #e8e0cc;cursor:pointer;transition:background 0.1s;text-transform:uppercase;color:var(--navy);}
 .ws-cell:hover{background:var(--gold-pale);}
 .ws-cell.selected{background:var(--gold-light);}
@@ -127,7 +127,7 @@ body{font-family:'Source Sans 3','Segoe UI',Arial,sans-serif,'Segoe UI',Arial,sa
 .word-list{display:flex;flex-wrap:wrap;gap:0.4rem;margin:0.75rem 0;}
 .word-chip{font-family:'Source Sans 3','Segoe UI',Arial,sans-serif,'Segoe UI',Arial,sans-serif;font-size:0.8rem;font-weight:600;padding:0.25rem 0.65rem;background:var(--navy);color:var(--gold-light);border-radius:50px;text-transform:uppercase;}
 .word-chip.found{background:#c8e6c9;color:#1b5e20;text-decoration:line-through;}
-.ws-wrapper{overflow-x:auto;padding-bottom:0.5rem;}
+.ws-wrapper{overflow-x:auto;padding-bottom:0.5rem;touch-action:pan-x;}
 
 /* SCRAMBLE */
 .scramble-words{display:flex;flex-wrap:wrap;gap:0.4rem;min-height:52px;padding:0.65rem;background:var(--parchment);border:2px dashed #c8b882;border-radius:var(--radius);margin-bottom:0.75rem;}
@@ -207,15 +207,125 @@ body{font-family:'Source Sans 3','Segoe UI',Arial,sans-serif,'Segoe UI',Arial,sa
   .print-answer-line{border-bottom:1pt solid #aaa;margin:5pt 0;min-height:18pt;}
   .print-header{display:flex;justify-content:space-between;border-bottom:1pt solid #ccc;padding-bottom:5pt;margin-bottom:10pt;font-size:8pt;color:#666;}
 }
+
+  /* ── DEVOTION VARIABLES ── */
+  :root {
+    --sunrise-deep:#1a3a5c; --sunrise-coral:#f4845f; --sunrise-gold:#f7c948;
+    --sea-foam:#7dd4c0; --sand:#fef6e4; --sunrise-mid:#e8956d;
+  }
+
+  /* ── HEADER SUN ── */
+  .header-sun{width:52px;height:52px;border-radius:50%;background:radial-gradient(circle at 40% 40%,#ffe566,#f7c948 50%,#f4845f);box-shadow:0 0 30px #f7c94888,0 0 60px #f7c94844;margin:0 auto 0.5rem;animation:sunPulse 4s ease-in-out infinite;}
+  @keyframes sunPulse{0%,100%{box-shadow:0 0 30px #f7c94888,0 0 60px #f7c94844;}50%{box-shadow:0 0 45px #f7c948cc,0 0 90px #f7c94866;}}
+
+  /* ── WAVE FOOTER ── */
+  .wave-footer{height:48px;background:linear-gradient(180deg,transparent,var(--sea-foam) 80%);position:relative;overflow:hidden;margin-top:2rem;}
+  .wave-footer::before{content:'';position:absolute;bottom:0;left:-50%;width:200%;height:40px;background:var(--sea-foam);border-radius:50% 50% 0 0;animation:waveMove 6s ease-in-out infinite;}
+  @keyframes waveMove{0%,100%{transform:translateX(0) scaleY(1);}50%{transform:translateX(3%) scaleY(1.1);}}
+
+  /* ── DEVOTION SCREEN ── */
+  .devo-screen{background:linear-gradient(160deg,#1a3a5c 0%,#2d6a8a 30%,#e8956d 65%,#fef6e4 100%);min-height:100vh;padding:1.25rem;}
+  .devo-screen .devo-card-inner{background:rgba(255,255,255,0.92);border-radius:var(--radius);padding:1.25rem 1.5rem;margin-bottom:1rem;box-shadow:0 4px 20px rgba(26,58,92,0.12);border:1px solid rgba(247,201,72,0.2);}
+  .devo-section-title{font-family:'Playfair Display',Georgia,serif;font-size:1.05rem;font-weight:600;color:var(--sunrise-deep);margin-bottom:0.75rem;display:flex;align-items:center;gap:0.5rem;}
+
+  /* Scripture banner */
+  .scripture-banner{background:linear-gradient(135deg,rgba(26,58,92,0.85),rgba(45,106,138,0.85));border-radius:var(--radius);padding:1rem 1.5rem;margin-bottom:1rem;text-align:center;color:white;}
+  .scripture-banner .verse-quote{font-family:'Playfair Display',Georgia,serif;font-style:italic;font-size:1rem;line-height:1.7;color:#fef6e4;}
+  .scripture-banner .verse-cite{font-size:0.8rem;color:var(--sunrise-gold);margin-top:0.4rem;font-weight:600;letter-spacing:0.04em;}
+
+  /* Today card */
+  .today-date{text-align:center;color:var(--sunrise-deep);font-size:0.9rem;margin-bottom:0.75rem;font-weight:500;}
+  .week-dots{display:flex;justify-content:center;gap:0.5rem;margin:0.75rem 0;}
+  .week-dot{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:600;border:2px solid #e0d5b8;background:#f5f0e8;color:#888;transition:all 0.2s;}
+  .week-dot.done{background:var(--sunrise-coral);border-color:var(--sunrise-coral);color:white;}
+  .week-dot.today{border-color:var(--sunrise-gold);box-shadow:0 0 0 3px rgba(247,201,72,0.3);}
+  .week-dot.today.done{background:var(--sunrise-coral);border-color:var(--sunrise-gold);}
+  .streak-display{text-align:center;font-size:0.9rem;color:var(--sunrise-deep);margin:0.5rem 0;}
+  .streak-display strong{color:var(--sunrise-coral);font-size:1.1rem;}
+  .mark-btn{display:block;width:100%;padding:0.85rem;border:none;border-radius:var(--radius);font-family:'Playfair Display',Georgia,serif;font-size:1rem;font-weight:600;cursor:pointer;transition:all 0.2s;margin-top:0.75rem;letter-spacing:0.02em;}
+  .mark-btn.mark{background:linear-gradient(135deg,var(--sunrise-coral),var(--sunrise-mid));color:white;box-shadow:0 4px 15px rgba(244,132,95,0.35);}
+  .mark-btn.mark:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(244,132,95,0.45);}
+  .mark-btn.done{background:var(--success-bg);color:var(--success);border:1.5px solid #a8d5b4;}
+  .encourage-bar{background:linear-gradient(135deg,rgba(125,212,192,0.2),rgba(247,201,72,0.15));border:1px solid rgba(125,212,192,0.4);border-radius:8px;padding:0.6rem 1rem;text-align:center;font-size:0.85rem;color:var(--sunrise-deep);margin-top:0.6rem;font-style:italic;}
+
+  /* Weekly goal */
+  .goal-select{width:100%;padding:0.6rem 0.75rem;border-radius:8px;border:1px solid #c8b882;background:var(--navy);color:var(--gold-light);font-size:0.95rem;font-family:'Source Sans 3','Segoe UI',Arial,sans-serif;font-weight:600;margin-bottom:0.75rem;}
+  .week-progress-bar{height:8px;border-radius:50px;background:#e8e0cc;overflow:hidden;margin:0.5rem 0;}
+  .week-progress-fill{height:100%;border-radius:50px;background:linear-gradient(90deg,var(--sea-foam),var(--sunrise-gold));transition:width 0.4s;}
+  .week-days-row{display:flex;justify-content:center;gap:0.4rem;margin:0.5rem 0;}
+  .wday-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:600;background:#f0ebe0;border:1.5px solid #e0d5b8;color:#888;}
+  .wday-dot.done{background:var(--navy);color:var(--gold-light);border-color:var(--navy);}
+  .wday-dot.today{border-color:var(--sunrise-gold);}
+  .week-label{text-align:center;font-size:0.82rem;color:var(--text-muted);margin-top:0.25rem;}
+
+  /* Prayer */
+  .prayer-prompt{font-size:0.88rem;color:var(--sunrise-coral);font-style:italic;margin-bottom:0.6rem;}
+  .prayer-textarea{width:100%;min-height:100px;padding:0.75rem;border-radius:var(--radius);border:1px solid #c8b882;background:#1a2744;color:#fef6e4;font-family:'Playfair Display',Georgia,serif;font-size:0.95rem;line-height:1.6;resize:vertical;}
+  .prayer-textarea::placeholder{color:rgba(254,246,228,0.4);}
+  .prayer-save-note{font-size:0.75rem;color:var(--text-muted);margin-top:0.35rem;text-align:right;}
+
+  /* Badges */
+  .badge-progress-text{text-align:center;font-size:0.82rem;color:var(--text-muted);margin-bottom:0.75rem;}
+  .badge-progress-bar{height:7px;border-radius:50px;background:#e8e0cc;overflow:hidden;margin-bottom:1rem;}
+  .badge-progress-fill{height:100%;border-radius:50px;background:linear-gradient(90deg,var(--sunrise-coral),var(--sunrise-gold));transition:width 0.5s;}
+  .badges-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem;}
+  .badge-item{text-align:center;}
+  .badge-circle{width:56px;height:56px;border-radius:50%;margin:0 auto 0.35rem;display:flex;align-items:center;justify-content:center;font-size:1.5rem;border:2px solid #e0d5b8;background:#f5f0e8;transition:all 0.3s;}
+  .badge-circle.earned{background:linear-gradient(135deg,var(--sunrise-gold),var(--sunrise-coral));border-color:var(--sunrise-gold);box-shadow:0 4px 15px rgba(247,201,72,0.4);}
+  .badge-circle.locked{filter:grayscale(1);opacity:0.5;}
+  .badge-name{font-size:0.7rem;color:var(--text-muted);font-weight:600;line-height:1.3;}
+  .badge-name.earned{color:var(--sunrise-coral);}
+
+  /* Monthly calendar */
+  .cal-header-row{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px;}
+  .cal-day-label{text-align:center;font-size:0.7rem;font-weight:600;color:var(--text-muted);padding:2px 0;}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+  .cal-day{aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:500;border:1.5px solid transparent;background:rgba(244,132,95,0.08);color:#aaa;cursor:pointer;transition:all 0.15s;}
+  .cal-day.has-date{color:var(--text-muted);background:rgba(247,201,72,0.1);border-color:rgba(247,201,72,0.2);}
+  .cal-day.has-date:hover{border-color:var(--sunrise-coral);}
+  .cal-day.completed{background:linear-gradient(135deg,var(--sunrise-coral),var(--sunrise-mid));color:white;border-color:var(--sunrise-coral);}
+  .cal-day.today-cal{border-color:var(--sunrise-gold);border-width:2.5px;font-weight:700;}
+  .cal-day.today-cal.completed{box-shadow:0 0 0 3px rgba(247,201,72,0.3);}
+  .cal-day.future{opacity:0.3;cursor:default;}
+
+  /* Celebration overlay */
+  .celebration-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:300;align-items:center;justify-content:center;}
+  .celebration-overlay.show{display:flex;}
+  .celebration-card{background:white;border-radius:20px;padding:2.5rem 2rem;max-width:360px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3);}
+  .celebration-card .cel-icon{font-size:3.5rem;margin-bottom:0.75rem;animation:bounceIn 0.5s ease;}
+  .celebration-card h2{font-family:'Playfair Display',Georgia,serif;color:var(--sunrise-deep);font-size:1.6rem;margin-bottom:0.5rem;}
+  .celebration-card p{color:var(--text-muted);font-size:0.92rem;line-height:1.6;margin-bottom:1.25rem;}
+  .celebration-card .cel-verse{background:var(--gold-pale);border-radius:10px;padding:0.85rem 1rem;font-family:'Playfair Display',Georgia,serif;font-style:italic;font-size:0.9rem;color:var(--sunrise-deep);margin-bottom:1.25rem;}
+  @keyframes bounceIn{0%{transform:scale(0.3);opacity:0;}60%{transform:scale(1.15);}100%{transform:scale(1);opacity:1;}}
+  .particles{position:fixed;inset:0;pointer-events:none;z-index:299;}
+  .particle{position:absolute;border-radius:50%;animation:particleFall 1.5s ease-in forwards;}
+  @keyframes particleFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1;}100%{transform:translateY(100vh) rotate(720deg);opacity:0;}}
+
+  /* Home devo summary */
+  .home-devo-banner{background:linear-gradient(135deg,rgba(26,58,92,0.9),rgba(45,106,138,0.85));border-radius:var(--radius);padding:0.85rem 1.25rem;margin-bottom:1rem;text-align:center;color:white;}
+  .home-devo-banner .verse-text-sm{font-family:'Playfair Display',Georgia,serif;font-style:italic;font-size:0.92rem;color:#fef6e4;}
+  .home-devo-banner .verse-ref-sm{font-size:0.75rem;color:var(--sunrise-gold);margin-top:0.3rem;}
+
+
+  @media (max-width: 500px) {
+    .ws-cell { width: 24px; height: 24px; font-size: 0.72rem; }
+    #ws-grid { border-radius: 6px; }
+  }
+  @media (max-width: 380px) {
+    .ws-cell { width: 21px; height: 21px; font-size: 0.65rem; }
+  }
+
 </style>
 </head>
 <body>
 <div class="app-header">
-  <h1>✦ Scripture Learning Games ✦</h1>
-  <p>Gospel of John &bull; Proverbs &bull; Colossians &mdash; ESV Translation</p>
+  <div class="header-sun" id="header-sun"></div>
+  <h1>✦ Daily Scripture &amp; Devotion ✦</h1>
+  <p id="header-verse-display">Gospel of John &bull; Proverbs &bull; Colossians &mdash; ESV</p>
 </div>
 <nav class="game-nav">
   <button class="nav-btn active" onclick="navTo('home')">🏠 Home</button>
+  <button class="nav-btn" onclick="navTo('devotion')">🌅 Devotion</button>
   <button class="nav-btn" onclick="navTo('read')">📖 Read</button>
   <button class="nav-btn" onclick="navTo('fitb')">✏️ Fill in Blank</button>
   <button class="nav-btn" onclick="navTo('wordsearch')">🔍 Word Search</button>
@@ -228,12 +338,18 @@ body{font-family:'Source Sans 3','Segoe UI',Arial,sans-serif,'Segoe UI',Arial,sa
 <!-- HOME -->
 <div id="screen-home" class="screen active">
   <div class="home-hero">
-    <p>"Your word is a lamp to my feet and a light to my path." — Psalm 119:105</p>
+    <div id="home-devo-summary"></div>
+    <p id="home-verse-banner"></p>
   </div>
   <div class="section-heading">📚 Choose a Book to Study</div>
   <div class="book-picker" id="home-books"></div>
   <div class="section-heading">🎮 Games</div>
   <div class="home-cards">
+    <div class="home-card devo-card" onclick="navTo('devotion')" style="border-color:var(--sunrise-coral);background:linear-gradient(135deg,#fff8f0,#fff3e8)">
+      <div class="icon">🌅</div><h3>Morning Devotion</h3>
+      <p id="home-devo-card-text">Track your daily time with God</p>
+      <div id="home-streak-display" style="margin-top:0.5rem;font-size:0.9rem;font-weight:600;color:var(--sunrise-coral)"></div>
+    </div>
     <div class="home-card" onclick="navTo('read')"><div class="icon">📖</div><h3>Read a Chapter</h3><p>Read scripture then launch puzzles from the text</p></div>
     <div class="home-card" onclick="navTo('fitb')"><div class="icon">✏️</div><h3>Fill in the Blank</h3><p>10 levels · multiple choice · earn points</p></div>
     <div class="home-card" onclick="navTo('wordsearch')"><div class="icon">🔍</div><h3>Word Search</h3><p>10 levels · find hidden words in a grid</p></div>
@@ -373,6 +489,87 @@ body{font-family:'Source Sans 3','Segoe UI',Arial,sans-serif,'Segoe UI',Arial,sa
   </div>
 </div>
 
+
+<!-- DEVOTION -->
+<div id="screen-devotion" class="screen">
+<div class="devo-screen">
+
+  <!-- Scripture Banner -->
+  <div class="scripture-banner">
+    <div class="verse-quote" id="devo-verse-text"></div>
+    <div class="verse-cite" id="devo-verse-ref"></div>
+  </div>
+
+  <!-- TODAY -->
+  <div class="devo-card-inner">
+    <div class="devo-section-title">🌅 Today</div>
+    <div class="today-date" id="devo-today-date"></div>
+    <div class="week-dots" id="devo-week-dots"></div>
+    <div class="streak-display">Current streak: <strong id="devo-streak-num">0</strong> days</div>
+    <div class="encourage-bar" id="devo-encourage"></div>
+    <button class="mark-btn mark" id="devo-mark-btn" onclick="toggleToday()">☀️ Mark Today Complete</button>
+  </div>
+
+  <!-- WEEKLY GOAL -->
+  <div class="devo-card-inner">
+    <div class="devo-section-title">🎯 Weekly Goal</div>
+    <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem;">
+      <label style="font-size:0.85rem;color:var(--text-muted);white-space:nowrap">Days per week goal</label>
+      <select class="goal-select" id="devo-goal-select" onchange="saveGoal()">
+        <option value="3">3 days</option>
+        <option value="4">4 days</option>
+        <option value="5" selected>5 days</option>
+        <option value="6">6 days</option>
+        <option value="7">7 days</option>
+      </select>
+    </div>
+    <div class="week-days-row" id="devo-week-days"></div>
+    <div class="week-progress-bar"><div class="week-progress-fill" id="devo-week-fill" style="width:0%"></div></div>
+    <div class="week-label" id="devo-week-label"></div>
+  </div>
+
+  <!-- PRAYER & REFLECTION -->
+  <div class="devo-card-inner">
+    <div class="devo-section-title">🙏 Prayer &amp; Reflection</div>
+    <div class="prayer-prompt" id="devo-prayer-prompt"></div>
+    <textarea class="prayer-textarea" id="devo-prayer-text" placeholder="Write your prayer or reflection here..." oninput="savePrayer()"></textarea>
+    <div class="prayer-save-note">Saves automatically ✓</div>
+  </div>
+
+  <!-- MILESTONE BADGES -->
+  <div class="devo-card-inner">
+    <div class="devo-section-title">🏆 Milestone Badges</div>
+    <div class="badge-progress-text" id="devo-badge-progress-text"></div>
+    <div class="badge-progress-bar"><div class="badge-progress-fill" id="devo-badge-fill" style="width:0%"></div></div>
+    <div class="badges-grid" id="devo-badges-grid"></div>
+  </div>
+
+  <!-- THIS MONTH -->
+  <div class="devo-card-inner">
+    <div class="devo-section-title">📅 This Month</div>
+    <div class="cal-header-row">
+      <div class="cal-day-label">S</div><div class="cal-day-label">M</div>
+      <div class="cal-day-label">T</div><div class="cal-day-label">W</div>
+      <div class="cal-day-label">T</div><div class="cal-day-label">F</div>
+      <div class="cal-day-label">S</div>
+    </div>
+    <div class="cal-grid" id="devo-cal-grid"></div>
+  </div>
+
+  <!-- Connect to Scripture -->
+  <div class="devo-card-inner" style="text-align:center;background:linear-gradient(135deg,rgba(26,58,92,0.05),rgba(247,201,72,0.08))">
+    <div class="devo-section-title" style="justify-content:center">📖 Continue in the Word</div>
+    <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1rem">Read a chapter, then test yourself with the games</p>
+    <div style="display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-primary btn-sm" onclick="navTo('read')">📖 Read Scripture</button>
+      <button class="btn btn-secondary btn-sm" onclick="navTo('fitb')">✏️ Play Games</button>
+    </div>
+  </div>
+
+  <div class="wave-footer"></div>
+</div>
+</div>
+
 <!-- TRACKER -->
 <div id="screen-tracker" class="screen">
   <h2 style="font-family:'Playfair Display',Georgia,'Times New Roman',serif;color:var(--navy);margin-bottom:1rem;font-size:1.4rem;">📊 Your Progress</h2>
@@ -441,6 +638,420 @@ const BOOK_INFO = {
   Proverbs:{icon:'🌿',desc:'31 chapters · Wisdom · ESV'},
   Colossians:{icon:'✉️',desc:'4 chapters · Epistle · ESV'}
 };
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  DEVOTION DATA
+// ═══════════════════════════════════════════════════════════════════════════
+const DEVO_VERSES = [
+  {text:"Ask, and it will be given to you; seek, and you will find.",ref:"Matthew 7:7"},
+  {text:"I can do all things through him who strengthens me.",ref:"Philippians 4:13"},
+  {text:"Trust in the Lord with all your heart.",ref:"Proverbs 3:5"},
+  {text:"The Lord is my shepherd; I shall not want.",ref:"Psalm 23:1"},
+  {text:"Be still, and know that I am God.",ref:"Psalm 46:10"},
+  {text:"Your word is a lamp to my feet and a light to my path.",ref:"Psalm 119:105"},
+  {text:"Come to me, all who labor and are heavy laden, and I will give you rest.",ref:"Matthew 11:28"},
+  {text:"For God so loved the world, that he gave his only Son.",ref:"John 3:16"},
+  {text:"The Lord is near to all who call on him.",ref:"Psalm 145:18"},
+  {text:"Great is your faithfulness.",ref:"Lamentations 3:23"},
+  {text:"Delight yourself in the Lord, and he will give you the desires of your heart.",ref:"Psalm 37:4"},
+  {text:"Let the word of Christ dwell in you richly.",ref:"Colossians 3:16"},
+  {text:"Rejoice always, pray without ceasing, give thanks in all circumstances.",ref:"1 Thessalonians 5:16-18"},
+  {text:"Draw near to God, and he will draw near to you.",ref:"James 4:8"},
+  {text:"The steadfast love of the Lord never ceases; his mercies never come to an end.",ref:"Lamentations 3:22"},
+  {text:"Seek first the kingdom of God and his righteousness.",ref:"Matthew 6:33"},
+  {text:"I am the way, and the truth, and the life.",ref:"John 14:6"},
+  {text:"Whatever you do, work heartily, as for the Lord and not for men.",ref:"Colossians 3:23"},
+  {text:"God is our refuge and strength, a very present help in trouble.",ref:"Psalm 46:1"},
+  {text:"This is the day that the Lord has made; let us rejoice and be glad in it.",ref:"Psalm 118:24"}
+];
+
+const PRAYER_PROMPTS = [
+  "What are you grateful for this morning? Begin in thanksgiving...",
+  "Where do you need God's wisdom and guidance today?",
+  "Who can you pray for and encourage today?",
+  "What are you trusting God with right now?",
+  "How have you seen God's faithfulness this week?",
+  "What Scripture spoke to your heart recently?",
+  "Bring your worries to the Lord — cast every anxiety on Him.",
+  "Thank God for three specific blessings in your life right now."
+];
+
+const ENCOURAGEMENTS = [
+  "Your faithfulness honors God — keep going! 🌅",
+  "Well done! Another day seeking His presence. ✨",
+  "The Lord sees your devotion and is pleased! 🙏",
+  "You are rooted and growing in faith! 🌱",
+  "His mercies are new every morning — great is His faithfulness! 🌤️",
+  "Keep pressing into His presence. He rewards those who seek Him! ⭐",
+  "Today's devotion is an investment in eternity! 💛",
+  "God is doing something beautiful in you through this daily habit! 🌸"
+];
+
+const BADGES = [
+  {name:"First Steps", icon:"👣", weeks:1, verse:"The Lord directs the steps of the godly. — Psalm 37:23"},
+  {name:"Growing Faith", icon:"🌱", weeks:3, verse:"Faith comes from hearing. — Romans 10:17"},
+  {name:"Steady Stream", icon:"💧", weeks:5, verse:"Like a tree planted by streams of water. — Psalm 1:3"},
+  {name:"Morning Light", icon:"🌅", weeks:7, verse:"His mercies are new every morning. — Lamentations 3:23"},
+  {name:"Deep Roots", icon:"🌳", weeks:10, verse:"Rooted and built up in him. — Colossians 2:7"},
+  {name:"Burning Bright", icon:"🔥", weeks:13, verse:"Let your light shine before others. — Matthew 5:16"},
+  {name:"Faithful & True", icon:"👑", weeks:16, verse:"Well done, good and faithful servant. — Matthew 25:23"}
+];
+
+const STREAK_VERSES = [
+  {text:"Blessed is the man who walks not in the counsel of the wicked.", ref:"Psalm 1:1"},
+  {text:"Those who seek the Lord lack no good thing.", ref:"Psalm 34:10"},
+  {text:"Seek the Lord while he may be found.", ref:"Isaiah 55:6"},
+  {text:"Draw near to God, and he will draw near to you.", ref:"James 4:8"},
+  {text:"The Lord rewards those who earnestly seek him.", ref:"Hebrews 11:6"}
+];
+
+const DEVO_SK = 'devotion_tracker_v2';
+
+// ── DEVOTION STORAGE ──
+function loadDevo() {
+  try { return JSON.parse(localStorage.getItem(DEVO_SK)) || defaultDevo(); }
+  catch(e) { return defaultDevo(); }
+}
+function defaultDevo() {
+  return { completedDays:{}, streak:0, lastCompleted:null, weeklyGoal:5,
+           prayer:{}, qualifyingWeeks:0, earnedBadges:[], lastStreakCelebration:0, lastBadgeCelebration:-1 };
+}
+function saveDevo(d) { try{localStorage.setItem(DEVO_SK,JSON.stringify(d));}catch(e){} }
+
+// ── DATE HELPERS ──
+function todayKey() {
+  const n=new Date(); return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;
+}
+function dateKey(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function dayOfWeek(key) { return new Date(key+'T12:00:00').getDay(); }
+function getWeekStart() {
+  const now=new Date(); const day=now.getDay();
+  const start=new Date(now); start.setDate(now.getDate()-day); return dateKey(start);
+}
+
+// ── STREAK CALCULATION ──
+function calcStreak(completed) {
+  let streak=0; const today=new Date(); const d=new Date(today);
+  while(true) {
+    const key=dateKey(d);
+    if(completed[key]) { streak++; d.setDate(d.getDate()-1); }
+    else if(key===dateKey(today) && !completed[key]) { d.setDate(d.getDate()-1); if(!completed[dateKey(d)]) break; }
+    else break;
+  }
+  return streak;
+}
+
+// ── QUALIFYING WEEKS ──
+function calcQualifyingWeeks(completed, goal) {
+  const keys = Object.keys(completed).filter(k=>completed[k]).sort();
+  if(!keys.length) return 0;
+  const weeks = {};
+  keys.forEach(k=>{
+    const d=new Date(k+'T12:00:00');
+    const sun=new Date(d); sun.setDate(d.getDate()-d.getDay());
+    const wk=dateKey(sun);
+    weeks[wk]=(weeks[wk]||0)+1;
+  });
+  return Object.values(weeks).filter(c=>c>=goal).length;
+}
+
+// ── DAILY VERSE (rotates by day of year) ──
+function getDailyVerse() {
+  const now=new Date();
+  const doy=Math.floor((now-(new Date(now.getFullYear(),0,0)))/(1000*60*60*24));
+  return DEVO_VERSES[doy % DEVO_VERSES.length];
+}
+
+function getDailyPrayerPrompt() {
+  const now=new Date();
+  const doy=Math.floor((now-(new Date(now.getFullYear(),0,0)))/(1000*60*60*24));
+  return PRAYER_PROMPTS[doy % PRAYER_PROMPTS.length];
+}
+
+// ── RENDER DEVOTION SCREEN ──
+function renderDevotion() {
+  const devo=loadDevo();
+  const today=todayKey();
+  const todayDone=!!devo.completedDays[today];
+  const streak=calcStreak(devo.completedDays);
+  const goal=parseInt(devo.weeklyGoal)||5;
+
+  // Daily verse
+  const verse=getDailyVerse();
+  const vel=document.getElementById('devo-verse-text');
+  const vrel=document.getElementById('devo-verse-ref');
+  if(vel) vel.textContent='"'+verse.text+'"';
+  if(vrel) vrel.textContent='— '+verse.ref;
+
+  // Today date
+  const dateEl=document.getElementById('devo-today-date');
+  if(dateEl) dateEl.textContent=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+
+  // Week dots (Sun-Sat)
+  const weekDotsEl=document.getElementById('devo-week-dots');
+  if(weekDotsEl) {
+    const DAYS=['S','M','T','W','T','F','S'];
+    const now=new Date(); const todayDow=now.getDay();
+    let html='';
+    for(let i=0;i<7;i++) {
+      const d=new Date(now); d.setDate(now.getDate()-(todayDow-i));
+      const key=dateKey(d); const done=!!devo.completedDays[key];
+      const isToday=(i===todayDow);
+      html+=`<div class="week-dot${done?' done':''}${isToday?' today':''}">${DAYS[i]}</div>`;
+    }
+    weekDotsEl.innerHTML=html;
+  }
+
+  // Streak
+  const sEl=document.getElementById('devo-streak-num');
+  if(sEl) sEl.textContent=streak;
+
+  // Encouragement
+  const encEl=document.getElementById('devo-encourage');
+  if(encEl) {
+    const idx=streak%ENCOURAGEMENTS.length;
+    encEl.textContent=ENCOURAGEMENTS[todayDone?idx:0];
+    encEl.style.display='block';
+  }
+
+  // Mark button
+  const markBtn=document.getElementById('devo-mark-btn');
+  if(markBtn) {
+    if(todayDone) {
+      markBtn.className='mark-btn done';
+      markBtn.textContent='✅ Completed Today — tap to undo';
+    } else {
+      markBtn.className='mark-btn mark';
+      markBtn.textContent='☀️ Mark Today Complete';
+    }
+  }
+
+  // Weekly goal select
+  const goalSel=document.getElementById('devo-goal-select');
+  if(goalSel) goalSel.value=goal;
+
+  // Week days row
+  const wdEl=document.getElementById('devo-week-days');
+  if(wdEl) {
+    const DAYS=['S','M','T','W','T','F','S'];
+    const now=new Date(); const todayDow=now.getDay();
+    const weekStart=new Date(now); weekStart.setDate(now.getDate()-todayDow);
+    let html='';
+    for(let i=0;i<7;i++) {
+      const d=new Date(weekStart); d.setDate(weekStart.getDate()+i);
+      const key=dateKey(d); const done=!!devo.completedDays[key];
+      const isToday=(i===todayDow);
+      html+=`<div class="wday-dot${done?' done':''}${isToday?' today':''}">${DAYS[i]}</div>`;
+    }
+    wdEl.innerHTML=html;
+  }
+
+  // Week progress
+  const now2=new Date(); const todayDow2=now2.getDay();
+  const weekStart2=new Date(now2); weekStart2.setDate(now2.getDate()-todayDow2);
+  let weekDone=0;
+  for(let i=0;i<7;i++){const d=new Date(weekStart2);d.setDate(weekStart2.getDate()+i);if(devo.completedDays[dateKey(d)])weekDone++;}
+  const fillPct=Math.min(100,Math.round((weekDone/goal)*100));
+  const fillEl=document.getElementById('devo-week-fill');
+  if(fillEl) fillEl.style.width=fillPct+'%';
+  const wlEl=document.getElementById('devo-week-label');
+  if(wlEl) wlEl.textContent=`${weekDone} of ${goal} days completed this week`;
+
+  // Prayer
+  const ppEl=document.getElementById('devo-prayer-prompt');
+  if(ppEl) ppEl.textContent=getDailyPrayerPrompt();
+  const ptEl=document.getElementById('devo-prayer-text');
+  if(ptEl) ptEl.value=devo.prayer[today]||'';
+
+  // Badges
+  const qw=calcQualifyingWeeks(devo.completedDays,goal);
+  const nextBadge=BADGES.find(b=>!devo.earnedBadges.includes(b.name));
+  const bpEl=document.getElementById('devo-badge-progress-text');
+  if(bpEl) {
+    if(nextBadge) bpEl.textContent=`${qw} qualifying week${qw!==1?'s':''} — ${Math.max(0,nextBadge.weeks-qw)} more to earn "${nextBadge.name}"`;
+    else bpEl.textContent='All badges earned! Amazing faithfulness! 🏆';
+  }
+  const bfEl=document.getElementById('devo-badge-fill');
+  if(bfEl&&nextBadge) bfEl.style.width=Math.min(100,Math.round((qw/nextBadge.weeks)*100))+'%';
+
+  const bgEl=document.getElementById('devo-badges-grid');
+  if(bgEl) {
+    bgEl.innerHTML=BADGES.map(b=>{
+      const earned=devo.earnedBadges.includes(b.name)||(qw>=b.weeks);
+      return `<div class="badge-item">
+        <div class="badge-circle ${earned?'earned':'locked'}">${b.icon}</div>
+        <div class="badge-name ${earned?'earned':''}">${b.name}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // Calendar
+  renderCalendar(devo);
+
+  // Auto-earn badges
+  autoEarnBadges(devo, qw);
+}
+
+function renderCalendar(devo) {
+  const calEl=document.getElementById('devo-cal-grid');
+  if(!calEl) return;
+  const now=new Date(); const year=now.getFullYear(); const month=now.getMonth();
+  const firstDay=new Date(year,month,1).getDay();
+  const daysInMonth=new Date(year,month+1,0).getDate();
+  const todayNum=now.getDate();
+  let html='';
+  for(let i=0;i<firstDay;i++) html+='<div class="cal-day"></div>';
+  for(let d=1;d<=daysInMonth;d++) {
+    const key=`${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const done=!!devo.completedDays[key];
+    const isToday=(d===todayNum);
+    const isFuture=(d>todayNum);
+    html+=`<div class="cal-day has-date${done?' completed':''}${isToday?' today-cal':''}${isFuture?' future':''}" onclick="toggleCalDay('${key}')">${d}</div>`;
+  }
+  calEl.innerHTML=html;
+}
+
+function toggleCalDay(key) {
+  const now=new Date(); const today=todayKey();
+  if(key>today) return; // no future days
+  const devo=loadDevo();
+  devo.completedDays[key]=!devo.completedDays[key];
+  saveDevo(devo);
+  renderDevotion();
+}
+
+// ── MARK TODAY ──
+function toggleToday() {
+  const devo=loadDevo();
+  const today=todayKey();
+  const wasDone=!!devo.completedDays[today];
+  devo.completedDays[today]=!wasDone;
+
+  if(!wasDone) {
+    // Just completed
+    const streak=calcStreak(devo.completedDays);
+    devo.streak=streak;
+    devo.lastCompleted=today;
+    // Check 5-day streak celebration
+    if(streak>0&&streak%5===0&&streak!==devo.lastStreakCelebration) {
+      devo.lastStreakCelebration=streak;
+      saveDevo(devo);
+      setTimeout(()=>showStreakCelebration(streak),400);
+    }
+    // Log to game activity
+    logActivity('devo','🌅 Devotion completed: '+new Date().toLocaleDateString());
+    // Update home
+    updateHomeDevoSummary();
+  }
+  saveDevo(devo);
+  renderDevotion();
+  if(!wasDone) launchParticles();
+}
+
+function saveGoal() {
+  const devo=loadDevo();
+  devo.weeklyGoal=parseInt(document.getElementById('devo-goal-select').value)||5;
+  saveDevo(devo);
+  renderDevotion();
+}
+
+function savePrayer() {
+  const devo=loadDevo();
+  devo.prayer=devo.prayer||{};
+  devo.prayer[todayKey()]=document.getElementById('devo-prayer-text').value;
+  saveDevo(devo);
+}
+
+// ── AUTO EARN BADGES ──
+function autoEarnBadges(devo, qw) {
+  let changed=false;
+  BADGES.forEach(b=>{
+    if(qw>=b.weeks&&!devo.earnedBadges.includes(b.name)) {
+      devo.earnedBadges.push(b.name);
+      changed=true;
+      const badgeIdx=BADGES.indexOf(b);
+      if(badgeIdx>devo.lastBadgeCelebration) {
+        devo.lastBadgeCelebration=badgeIdx;
+        saveDevo(devo);
+        setTimeout(()=>showBadgeCelebration(b),600);
+      }
+    }
+  });
+  if(changed) saveDevo(devo);
+}
+
+// ── CELEBRATIONS ──
+function showStreakCelebration(streak) {
+  const sv=STREAK_VERSES[Math.floor(Math.random()*STREAK_VERSES.length)];
+  document.getElementById('cel-streak-title').textContent=`${streak}-Day Streak! 🔥`;
+  document.getElementById('cel-streak-msg').textContent=`Incredible! ${streak} days of seeking God. Your faithfulness is building something eternal.`;
+  document.getElementById('cel-streak-verse').textContent='"'+sv.text+'" — '+sv.ref;
+  document.getElementById('streak-celebration').classList.add('show');
+  launchParticles();
+}
+
+function showBadgeCelebration(badge) {
+  document.getElementById('cel-badge-icon').textContent=badge.icon;
+  document.getElementById('cel-badge-title').textContent=badge.name+' Badge Earned!';
+  document.getElementById('cel-badge-msg').textContent=`You've completed ${badge.weeks} qualifying weeks of devotion. This is a testimony of God's grace at work in you!`;
+  document.getElementById('cel-badge-verse').textContent='"'+badge.verse+'"';
+  document.getElementById('badge-celebration').classList.add('show');
+  launchParticles();
+}
+
+function closeCelebration(id) {
+  document.getElementById(id).classList.remove('show');
+}
+
+// ── PARTICLES ──
+function launchParticles() {
+  const container=document.getElementById('particles-container');
+  if(!container) return;
+  const colors=['#f7c948','#f4845f','#7dd4c0','#fef6e4','#e8956d','#ffffff'];
+  container.innerHTML='';
+  for(let i=0;i<40;i++) {
+    const p=document.createElement('div');
+    p.className='particle';
+    p.style.cssText=`width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;background:${colors[Math.floor(Math.random()*colors.length)]};left:${10+Math.random()*80}%;top:-10px;animation-delay:${Math.random()*0.8}s;animation-duration:${1.2+Math.random()*0.8}s;`;
+    container.appendChild(p);
+  }
+  setTimeout(()=>container.innerHTML='',3000);
+}
+
+// ── HOME SUMMARY ──
+function updateHomeDevoSummary() {
+  const devo=loadDevo();
+  const streak=calcStreak(devo.completedDays);
+  const today=todayKey();
+  const todayDone=!!devo.completedDays[today];
+  const verse=getDailyVerse();
+
+  // Home verse banner
+  const hvb=document.getElementById('home-verse-banner');
+  if(hvb) hvb.style.display='none'; // handled by home-devo-banner
+
+  const hds=document.getElementById('home-devo-summary');
+  if(hds) {
+    hds.innerHTML=`<div class="home-devo-banner">
+      <div class="verse-text-sm">"${verse.text}"</div>
+      <div class="verse-ref-sm">— ${verse.ref}</div>
+    </div>`;
+  }
+
+  // Devotion card on home
+  const hdct=document.getElementById('home-devo-card-text');
+  if(hdct) hdct.textContent=todayDone?'Today\'s devotion complete ✅':'Time with God — mark today complete';
+  const hsd=document.getElementById('home-streak-display');
+  if(hsd) hsd.textContent=streak>0?`🔥 ${streak}-day streak`:'Start your streak today!';
+
+  // Header verse
+  const hvd=document.getElementById('header-verse-display');
+  if(hvd) hvd.textContent=`${verse.ref} — Daily Word`;
+}
+
+
 
 // ═══════════════════════════════════════════════════════════════════════════
 //  LEVEL SYSTEM  (10 levels × 10 games)
@@ -534,11 +1145,12 @@ function navTo(id) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-'+id).classList.add('active');
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  const labels = {home:'Home',read:'Read',fitb:'Fill',wordsearch:'Word',scramble:'Scramble',tracker:'Progress'};
+  const labels = {home:'Home',devotion:'Devotion',read:'Read',fitb:'Fill',wordsearch:'Word',scramble:'Scramble',tracker:'Progress'};
   document.querySelectorAll('.nav-btn').forEach(b=>{
     if(b.textContent.includes(labels[id]||'')) b.classList.add('active');
   });
-  if(id==='home') renderHome();
+  if(id==='home') { renderHome(); updateHomeDevoSummary(); }
+  if(id==='devotion') renderDevotion();
   if(id==='read') { syncReadSelects(); }
   if(id==='fitb') { syncGameSelects('fitb'); startFITB(); }
   if(id==='wordsearch') { syncGameSelects('ws'); startWordSearch(); }
@@ -609,6 +1221,7 @@ function renderHome() {
       <p style="margin-top:0.3rem;font-size:0.75rem;color:var(--gold)">${vs} game verses</p>
     </div>`;
   }).join('');
+  updateHomeDevoSummary();
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -908,8 +1521,8 @@ function startWordSearch() {
     cell.addEventListener('mousedown',wsMouseDown);
     cell.addEventListener('mouseenter',wsMouseEnter);
     cell.addEventListener('mouseup',wsMouseUp);
-    cell.addEventListener('touchstart',wsTouchStart,{passive:true});
-    cell.addEventListener('touchmove',wsTouchMove,{passive:true});
+    cell.addEventListener('touchstart',wsTouchStart,{passive:false});
+    cell.addEventListener('touchmove',wsTouchMove,{passive:false});
     cell.addEventListener('touchend',wsTouchEnd);
     gridEl.appendChild(cell);
   }
@@ -959,8 +1572,30 @@ function wsClearHighlight(){document.querySelectorAll('.ws-cell.selected').forEa
 function wsMouseDown(e){const r=parseInt(e.target.dataset.r),c=parseInt(e.target.dataset.c);wsState.selecting=true;wsState.start={r,c};wsState.current={r,c};wsClearHighlight();e.target.classList.add('selected');}
 function wsMouseEnter(e){if(!wsState.selecting)return;wsState.current={r:parseInt(e.target.dataset.r),c:parseInt(e.target.dataset.c)};wsClearHighlight();wsGetSelection().forEach(({r,c})=>{const cell=wsGetCell(r,c);if(cell&&!cell.className.includes('found'))cell.classList.add('selected');});}
 function wsMouseUp(){if(!wsState.selecting)return;wsState.selecting=false;const sel=wsGetSelection();const word=sel.map(({r,c})=>wsState.grid[r][c]).join('');wsClearHighlight();wsCheckWord(word,sel);}
-function wsTouchStart(e){const t=e.touches[0],el=document.elementFromPoint(t.clientX,t.clientY);if(el&&el.classList.contains('ws-cell')){wsState.selecting=true;wsState.start={r:parseInt(el.dataset.r),c:parseInt(el.dataset.c)};wsState.current=wsState.start;}}
-function wsTouchMove(e){const t=e.touches[0],el=document.elementFromPoint(t.clientX,t.clientY);if(el&&el.classList.contains('ws-cell')&&wsState.selecting){wsState.current={r:parseInt(el.dataset.r),c:parseInt(el.dataset.c)};wsClearHighlight();wsGetSelection().forEach(({r,c})=>{const cell=wsGetCell(r,c);if(cell)cell.classList.add('selected');});}}
+function wsTouchStart(e){
+  e.preventDefault();
+  const t=e.touches[0],el=document.elementFromPoint(t.clientX,t.clientY);
+  if(el&&el.classList.contains('ws-cell')){
+    wsState.selecting=true;
+    wsState.start={r:parseInt(el.dataset.r),c:parseInt(el.dataset.c)};
+    wsState.current=wsState.start;
+    wsClearHighlight();
+    el.classList.add('selected');
+  }
+}
+function wsTouchMove(e){
+  e.preventDefault();
+  const t=e.touches[0],el=document.elementFromPoint(t.clientX,t.clientY);
+  if(!wsState.selecting) return;
+  if(el&&el.classList.contains('ws-cell')){
+    wsState.current={r:parseInt(el.dataset.r),c:parseInt(el.dataset.c)};
+    wsClearHighlight();
+    wsGetSelection().forEach(({r,c})=>{
+      const cell=wsGetCell(r,c);
+      if(cell&&!cell.className.includes('found')) cell.classList.add('selected');
+    });
+  }
+}
 function wsTouchEnd(){if(!wsState.selecting)return;wsState.selecting=false;const sel=wsGetSelection();const word=sel.map(({r,c})=>wsState.grid[r][c]).join('');wsClearHighlight();wsCheckWord(word,sel);}
 
 function wsCheckWord(word,sel){
@@ -1129,7 +1764,22 @@ function renderTracker(){
   const ta=(fitb.total||0)+(sc.total||0)+(ws.solved||0);
   const acc=ta>0?Math.round(100*tc/ta):0;
 
+  // Devotion stats
+  const devo=loadDevo();
+  const dStreak=calcStreak(devo.completedDays);
+  const dTotal=Object.values(devo.completedDays).filter(Boolean).length;
+  const dGoal=parseInt(devo.weeklyGoal)||5;
+  const dQW=calcQualifyingWeeks(devo.completedDays,dGoal);
+
   document.getElementById('tracker-summary').innerHTML=`
+    <div class="tracker-card" style="border-color:rgba(244,132,95,0.3);background:linear-gradient(135deg,#fff8f0,white)">
+      <div class="t-icon">🌅</div><div class="t-val">${dStreak}</div><div class="t-lbl">Devotion Streak</div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${Math.min(100,dStreak*10)}%;background:linear-gradient(90deg,var(--sunrise-coral),var(--sunrise-gold))"></div></div>
+    </div>
+    <div class="tracker-card" style="border-color:rgba(244,132,95,0.3);background:linear-gradient(135deg,#fff8f0,white)">
+      <div class="t-icon">📅</div><div class="t-val">${dTotal}</div><div class="t-lbl">Total Days</div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${Math.min(100,dTotal/3)}%;background:linear-gradient(90deg,var(--sunrise-coral),var(--sunrise-gold))"></div></div>
+    </div>
     <div class="tracker-card"><div class="t-icon">✏️</div><div class="t-val">${fitb.score||0}</div><div class="t-lbl">Fill-in Score</div>
       <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${Math.min(100,((fitb.correct||0)/Math.max(1,fitb.total||1))*100)}%"></div></div></div>
     <div class="tracker-card"><div class="t-icon">🔀</div><div class="t-val">${sc.score||0}</div><div class="t-lbl">Scramble Score</div>
@@ -1276,6 +1926,30 @@ scState.total=_prog.sc.total||0; scState.correct_count=_prog.sc.correct||0;
 
 document.addEventListener('mouseup',()=>{wsState.selecting=false;});
 renderHome();
+updateHomeDevoSummary();
+
 </script>
+
+<!-- CELEBRATION OVERLAYS -->
+<div class="particles" id="particles-container"></div>
+<div class="celebration-overlay" id="streak-celebration">
+  <div class="celebration-card">
+    <div class="cel-icon">🔥</div>
+    <h2 id="cel-streak-title">5-Day Streak!</h2>
+    <p id="cel-streak-msg">You are building a beautiful habit of seeking God daily.</p>
+    <div class="cel-verse" id="cel-streak-verse"></div>
+    <button class="btn btn-primary" onclick="closeCelebration('streak-celebration')">Keep Going! ›</button>
+  </div>
+</div>
+<div class="celebration-overlay" id="badge-celebration">
+  <div class="celebration-card">
+    <div class="cel-icon" id="cel-badge-icon">🏆</div>
+    <h2 id="cel-badge-title">Badge Earned!</h2>
+    <p id="cel-badge-msg"></p>
+    <div class="cel-verse" id="cel-badge-verse"></div>
+    <button class="btn btn-secondary" onclick="closeCelebration('badge-celebration')">Praise God! 🙏</button>
+  </div>
+</div>
+
 </body>
 </html>
