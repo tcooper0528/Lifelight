@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0060)file:///C:/Users/tcooper/Downloads/scripture_games_v2_5.html -->
+<!-- saved from url=(0060)file:///C:/Users/tcooper/Downloads/scripture_games_v2_6.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -393,7 +393,7 @@ body{font-family:'Source Sans 3','Segoe UI',Arial,sans-serif,'Segoe UI',Arial,sa
   <p id="header-verse-display">Matthew 7:7 — Daily Word</p>
   <div class="user-badge" id="user-badge">
     <span class="sync-indicator" id="sync-indicator">↑ syncing</span>
-    <img class="user-avatar" id="user-avatar" src="file:///C:/Users/tcooper/Downloads/scripture_games_v2_5.html" alt="">
+    <img class="user-avatar" id="user-avatar" src="file:///C:/Users/tcooper/Downloads/scripture_games_v2_6.html" alt="">
     <span class="user-name" id="user-name"></span>
     <button class="sign-out-btn" onclick="signOut()">Sign out</button>
   </div>
@@ -2254,11 +2254,23 @@ let syncTimeout = null;
 // ── AUTH FUNCTIONS ──
 function signInWithGoogle() {
   const provider = new firebase.auth.GoogleAuthProvider();
-  fbAuth.signInWithPopup(provider).catch(err => {
+  // Use redirect instead of popup - works on all browsers including Edge mobile
+  fbAuth.signInWithRedirect(provider).catch(err => {
     console.error('Sign in error:', err);
-    alert('Sign in failed. Please try again.');
+    alert('Sign in failed: ' + err.message);
   });
 }
+
+// Handle redirect result when page loads back after Google auth
+fbAuth.getRedirectResult().then(result => {
+  if(result && result.user) {
+    console.log('Signed in via redirect:', result.user.displayName);
+  }
+}).catch(err => {
+  if(err.code !== 'auth/no-auth-event') {
+    console.error('Redirect result error:', err);
+  }
+});
 
 function signOut() {
   if(confirm('Sign out of Scripture & Devotion?')) {
