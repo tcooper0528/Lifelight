@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
+<!-- saved from url=(0060)file:///C:/Users/tcooper/Downloads/scripture_games_v2_5.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Scripture Learning Games — ESV</title>
 <style>
@@ -315,45 +315,159 @@ body{font-family:'Source Sans 3','Segoe UI',Arial,sans-serif,'Segoe UI',Arial,sa
     .ws-cell { width: 21px; height: 21px; font-size: 0.65rem; }
   }
 
+
+  /* ── JOURNAL / NOTES ── */
+  .note-toolbar{display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;margin-bottom:0.6rem;}
+  .tag-btn{font-size:0.72rem;font-weight:600;padding:0.25rem 0.65rem;border-radius:50px;border:1.5px solid #d0c8b0;background:var(--white);color:var(--text-muted);cursor:pointer;transition:all 0.15s;}
+  .tag-btn.active{border-color:var(--sunrise-coral);background:rgba(244,132,95,0.1);color:var(--sunrise-coral);}
+  .tag-btn:hover{border-color:var(--sunrise-coral);}
+  .save-note-btn{font-family:'Source Sans 3','Segoe UI',Arial,sans-serif;font-size:0.82rem;font-weight:600;padding:0.4rem 1rem;background:var(--sunrise-coral);color:white;border:none;border-radius:50px;cursor:pointer;margin-left:auto;transition:all 0.2s;}
+  .save-note-btn:hover{background:var(--sunrise-mid);}
+  .note-saved-flash{font-size:0.75rem;color:var(--success);display:none;align-items:center;gap:4px;}
+  .note-saved-flash.show{display:flex;}
+
+  /* ── ANCHOR VERSE ── */
+  .anchor-verse-wrap{background:linear-gradient(135deg,rgba(247,201,72,0.15),rgba(244,132,95,0.1));border:1.5px solid rgba(247,201,72,0.4);border-radius:var(--radius);padding:0.85rem 1.1rem;margin-bottom:0.75rem;display:none;}
+  .anchor-verse-wrap.show{display:block;}
+  .anchor-label{font-size:0.7rem;font-weight:600;color:var(--sunrise-gold);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.35rem;}
+  .anchor-text{font-family:'Playfair Display',Georgia,serif;font-style:italic;font-size:0.95rem;color:var(--sunrise-deep);line-height:1.6;}
+  .anchor-ref{font-size:0.75rem;color:var(--sunrise-coral);font-weight:600;margin-top:0.25rem;}
+  .anchor-clear{float:right;background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.75rem;padding:0;}
+
+  /* ── READER SAVE VERSE ── */
+  .reader-verse{display:flex;gap:0.75rem;margin-bottom:0.6rem;line-height:1.8;align-items:flex-start;}
+  .reader-verse:hover .save-verse-btn{opacity:1;}
+  .save-verse-btn{opacity:0;font-size:0.7rem;font-weight:600;padding:0.2rem 0.55rem;background:var(--sunrise-gold);color:var(--white);border:none;border-radius:50px;cursor:pointer;transition:all 0.2s;white-space:nowrap;margin-top:0.35rem;flex-shrink:0;}
+  .save-verse-btn:hover{background:var(--sunrise-coral);}
+  .save-verse-btn.saved{background:var(--success);opacity:1;}
+
+  /* ── DAY DETAIL MODAL ── */
+  .day-modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:250;align-items:center;justify-content:center;padding:1rem;}
+  .day-modal-backdrop.open{display:flex;}
+  .day-modal{background:var(--white);border-radius:16px;padding:1.5rem;max-width:480px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.25);}
+  .day-modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;}
+  .day-modal-title{font-family:'Playfair Display',Georgia,serif;font-size:1.2rem;color:var(--sunrise-deep);}
+  .day-modal-close{background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--text-muted);line-height:1;}
+  .day-modal-section{margin-bottom:1rem;}
+  .day-modal-label{font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:0.35rem;}
+  .day-modal-content{font-family:'Playfair Display',Georgia,serif;font-size:0.95rem;color:var(--text);line-height:1.7;background:var(--parchment);border-radius:8px;padding:0.75rem 1rem;}
+  .day-modal-empty{color:var(--text-muted);font-style:italic;font-size:0.88rem;}
+  .day-modal-tag{display:inline-block;font-size:0.7rem;font-weight:600;padding:0.2rem 0.6rem;border-radius:50px;background:rgba(244,132,95,0.15);color:var(--sunrise-coral);border:1px solid rgba(244,132,95,0.3);margin-right:4px;}
+  .day-modal-done{display:inline-block;font-size:0.75rem;font-weight:600;padding:0.2rem 0.7rem;border-radius:50px;background:var(--success-bg);color:var(--success);border:1px solid #a8d5b4;}
+  .cal-day.has-note{box-shadow:inset 0 0 0 2px rgba(247,201,72,0.6);}
+  .cal-day.has-anchor{position:relative;}
+  .cal-day.has-anchor::after{content:'✦';position:absolute;top:-4px;right:-2px;font-size:8px;color:var(--sunrise-gold);}
+
+
+  /* ── AUTH ── */
+  .auth-overlay{display:none;position:fixed;inset:0;background:linear-gradient(160deg,#1a3a5c 0%,#2d6a8a 35%,#e8956d 70%,#fef6e4 100%);z-index:500;align-items:center;justify-content:center;flex-direction:column;}
+  .auth-overlay.show{display:flex;}
+  .auth-card{background:rgba(255,255,255,0.95);border-radius:20px;padding:2.5rem 2rem;max-width:360px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.2);}
+  .auth-sun{width:60px;height:60px;border-radius:50%;background:radial-gradient(circle at 40% 40%,#ffe566,#f7c948 50%,#f4845f);box-shadow:0 0 30px #f7c94888;margin:0 auto 1rem;animation:sunPulse 4s ease-in-out infinite;}
+  .auth-title{font-family:'Playfair Display',Georgia,serif;font-size:1.6rem;color:#1a3a5c;margin-bottom:0.25rem;}
+  .auth-sub{font-size:0.88rem;color:#5a5a7a;margin-bottom:1.5rem;line-height:1.5;}
+  .auth-verse{font-family:'Playfair Display',Georgia,serif;font-style:italic;font-size:0.85rem;color:#5a5a7a;background:#fdf6e3;border-radius:10px;padding:0.75rem 1rem;margin-bottom:1.5rem;line-height:1.6;}
+  .google-btn{display:flex;align-items:center;justify-content:center;gap:0.75rem;width:100%;padding:0.85rem 1rem;background:white;border:1.5px solid #dadce0;border-radius:50px;cursor:pointer;font-family:'Source Sans 3','Segoe UI',Arial,sans-serif;font-size:0.95rem;font-weight:600;color:#3c4043;transition:all 0.2s;box-shadow:0 2px 8px rgba(0,0,0,0.1);}
+  .google-btn:hover{box-shadow:0 4px 16px rgba(0,0,0,0.15);transform:translateY(-1px);}
+  .google-btn svg{width:20px;height:20px;flex-shrink:0;}
+  .auth-note{font-size:0.72rem;color:#aaa;margin-top:1rem;line-height:1.5;}
+
+  /* ── USER BADGE in header ── */
+  .user-badge{display:none;align-items:center;gap:0.5rem;position:absolute;right:1rem;top:50%;transform:translateY(-50%);}
+  .user-badge.show{display:flex;}
+  .user-avatar{width:28px;height:28px;border-radius:50%;border:2px solid var(--gold-light);}
+  .user-name{font-size:0.78rem;color:rgba(255,255,255,0.8);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .sign-out-btn{font-size:0.7rem;color:rgba(255,255,255,0.6);background:none;border:1px solid rgba(255,255,255,0.3);border-radius:50px;padding:0.15rem 0.6rem;cursor:pointer;transition:all 0.2s;}
+  .sign-out-btn:hover{background:rgba(255,255,255,0.1);color:white;}
+  .sync-indicator{font-size:0.7rem;color:var(--gold-light);margin-right:0.5rem;display:none;}
+  .sync-indicator.show{display:inline;}
+  .app-header{position:relative;}
+
 </style>
+
 </head>
 <body>
 <div class="app-header">
   <div class="header-sun" id="header-sun"></div>
   <h1>✦ Daily Scripture &amp; Devotion ✦</h1>
-  <p id="header-verse-display">Gospel of John &bull; Proverbs &bull; Colossians &mdash; ESV</p>
+  <p id="header-verse-display">Matthew 7:7 — Daily Word</p>
+  <div class="user-badge" id="user-badge">
+    <span class="sync-indicator" id="sync-indicator">↑ syncing</span>
+    <img class="user-avatar" id="user-avatar" src="file:///C:/Users/tcooper/Downloads/scripture_games_v2_5.html" alt="">
+    <span class="user-name" id="user-name"></span>
+    <button class="sign-out-btn" onclick="signOut()">Sign out</button>
+  </div>
 </div>
 <nav class="game-nav">
-  <button class="nav-btn active" onclick="navTo('home')">🏠 Home</button>
-  <button class="nav-btn" onclick="navTo('devotion')">🌅 Devotion</button>
-  <button class="nav-btn" onclick="navTo('read')">📖 Read</button>
-  <button class="nav-btn" onclick="navTo('fitb')">✏️ Fill in Blank</button>
-  <button class="nav-btn" onclick="navTo('wordsearch')">🔍 Word Search</button>
-  <button class="nav-btn" onclick="navTo('scramble')">🔀 Scramble</button>
-  <button class="nav-btn" onclick="navTo('tracker')">📊 Progress</button>
+  <button class="nav-btn active" onclick="navTo(&#39;home&#39;)">🏠 Home</button>
+  <button class="nav-btn" onclick="navTo(&#39;devotion&#39;)">🌅 Devotion</button>
+  <button class="nav-btn" onclick="navTo(&#39;read&#39;)">📖 Read</button>
+  <button class="nav-btn" onclick="navTo(&#39;fitb&#39;)">✏️ Fill in Blank</button>
+  <button class="nav-btn" onclick="navTo(&#39;wordsearch&#39;)">🔍 Word Search</button>
+  <button class="nav-btn" onclick="navTo(&#39;scramble&#39;)">🔀 Scramble</button>
+  <button class="nav-btn" onclick="navTo(&#39;tracker&#39;)">📊 Progress</button>
   <button class="nav-btn" onclick="openPrint()">🖨️ Print</button>
 </nav>
+
+<!-- AUTH OVERLAY -->
+<div class="auth-overlay show" id="auth-overlay">
+  <div class="auth-card">
+    <div class="auth-sun"></div>
+    <div class="auth-title">Daily Scripture &amp; Devotion</div>
+    <div class="auth-sub">Sign in to sync your devotion streak, notes, and game progress across all your devices.</div>
+    <div class="auth-verse">"Your word is a lamp to my feet and a light to my path." — Psalm 119:105</div>
+    <button class="google-btn" onclick="signInWithGoogle()">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+      </svg>
+      Sign in with Google
+    </button>
+    <div class="auth-note">Your data is private and only accessible to you. No passwords required.</div>
+  </div>
+</div>
+
 <div class="game-area">
 
 <!-- HOME -->
 <div id="screen-home" class="screen active">
   <div class="home-hero">
-    <div id="home-devo-summary"></div>
-    <p id="home-verse-banner"></p>
+    <div id="home-devo-summary"><div class="home-devo-banner">
+      <div class="verse-text-sm">"Ask, and it will be given to you; seek, and you will find."</div>
+      <div class="verse-ref-sm">— Matthew 7:7</div>
+    </div></div>
+    <p id="home-verse-banner" style="display: none;"></p>
   </div>
   <div class="section-heading">📚 Choose a Book to Study</div>
-  <div class="book-picker" id="home-books"></div>
+  <div class="book-picker" id="home-books"><div class="book-card active" id="book-card-John" onclick="setBook(&#39;John&#39;)">
+      <div class="b-icon">📜</div>
+      <h3>John</h3>
+      <p>21 chapters · Gospel · ESV</p>
+      <p style="margin-top:0.3rem;font-size:0.75rem;color:var(--gold)">271 game verses</p>
+    </div><div class="book-card" id="book-card-Proverbs" onclick="setBook(&#39;Proverbs&#39;)">
+      <div class="b-icon">🌿</div>
+      <h3>Proverbs</h3>
+      <p>31 chapters · Wisdom · ESV</p>
+      <p style="margin-top:0.3rem;font-size:0.75rem;color:var(--gold)">380 game verses</p>
+    </div><div class="book-card" id="book-card-Colossians" onclick="setBook(&#39;Colossians&#39;)">
+      <div class="b-icon">✉️</div>
+      <h3>Colossians</h3>
+      <p>4 chapters · Epistle · ESV</p>
+      <p style="margin-top:0.3rem;font-size:0.75rem;color:var(--gold)">56 game verses</p>
+    </div></div>
   <div class="section-heading">🎮 Games</div>
   <div class="home-cards">
-    <div class="home-card devo-card" onclick="navTo('devotion')" style="border-color:var(--sunrise-coral);background:linear-gradient(135deg,#fff8f0,#fff3e8)">
+    <div class="home-card devo-card" onclick="navTo(&#39;devotion&#39;)" style="border-color:var(--sunrise-coral);background:linear-gradient(135deg,#fff8f0,#fff3e8)">
       <div class="icon">🌅</div><h3>Morning Devotion</h3>
-      <p id="home-devo-card-text">Track your daily time with God</p>
-      <div id="home-streak-display" style="margin-top:0.5rem;font-size:0.9rem;font-weight:600;color:var(--sunrise-coral)"></div>
+      <p id="home-devo-card-text">Time with God — mark today complete</p>
+      <div id="home-streak-display" style="margin-top:0.5rem;font-size:0.9rem;font-weight:600;color:var(--sunrise-coral)">Start your streak today!</div>
     </div>
-    <div class="home-card" onclick="navTo('read')"><div class="icon">📖</div><h3>Read a Chapter</h3><p>Read scripture then launch puzzles from the text</p></div>
-    <div class="home-card" onclick="navTo('fitb')"><div class="icon">✏️</div><h3>Fill in the Blank</h3><p>10 levels · multiple choice · earn points</p></div>
-    <div class="home-card" onclick="navTo('wordsearch')"><div class="icon">🔍</div><h3>Word Search</h3><p>10 levels · find hidden words in a grid</p></div>
-    <div class="home-card" onclick="navTo('scramble')"><div class="icon">🔀</div><h3>Verse Scramble</h3><p>10 levels · restore the word order</p></div>
+    <div class="home-card" onclick="navTo(&#39;read&#39;)"><div class="icon">📖</div><h3>Read a Chapter</h3><p>Read scripture then launch puzzles from the text</p></div>
+    <div class="home-card" onclick="navTo(&#39;fitb&#39;)"><div class="icon">✏️</div><h3>Fill in the Blank</h3><p>10 levels · multiple choice · earn points</p></div>
+    <div class="home-card" onclick="navTo(&#39;wordsearch&#39;)"><div class="icon">🔍</div><h3>Word Search</h3><p>10 levels · find hidden words in a grid</p></div>
+    <div class="home-card" onclick="navTo(&#39;scramble&#39;)"><div class="icon">🔀</div><h3>Verse Scramble</h3><p>10 levels · restore the word order</p></div>
   </div>
 </div>
 
@@ -361,9 +475,9 @@ body{font-family:'Source Sans 3','Segoe UI',Arial,sans-serif,'Segoe UI',Arial,sa
 <div id="screen-read" class="screen">
   <div class="filter-bar">
     <label>Book:</label>
-    <select id="read-book" onchange="updateReadChapters()"></select>
+    <select id="read-book" onchange="updateReadChapters()"><option value="John">John</option><option value="Proverbs">Proverbs</option><option value="Colossians">Colossians</option></select>
     <label>Chapter:</label>
-    <select id="read-chapter" onchange="renderReader()"></select>
+    <select id="read-chapter" onchange="renderReader()"><option value="0">All chapters</option><option value="1">Chapter 1</option><option value="2">Chapter 2</option><option value="3">Chapter 3</option><option value="4">Chapter 4</option><option value="5">Chapter 5</option><option value="6">Chapter 6</option><option value="7">Chapter 7</option><option value="8">Chapter 8</option><option value="9">Chapter 9</option><option value="10">Chapter 10</option><option value="11">Chapter 11</option><option value="12">Chapter 12</option><option value="13">Chapter 13</option><option value="14">Chapter 14</option><option value="15">Chapter 15</option><option value="16">Chapter 16</option><option value="17">Chapter 17</option><option value="18">Chapter 18</option><option value="19">Chapter 19</option><option value="20">Chapter 20</option><option value="21">Chapter 21</option></select>
     <button class="btn btn-primary btn-sm" onclick="renderReader()" style="margin-left:auto">Go</button>
   </div>
   <div id="reader-content"></div>
@@ -373,9 +487,9 @@ body{font-family:'Source Sans 3','Segoe UI',Arial,sans-serif,'Segoe UI',Arial,sa
 <div id="screen-fitb" class="screen">
   <div class="filter-bar">
     <label>Book:</label>
-    <select id="fitb-book" onchange="updateGameChapters('fitb')"></select>
+    <select id="fitb-book" onchange="updateGameChapters(&#39;fitb&#39;)"><option value="John">John</option><option value="Proverbs">Proverbs</option><option value="Colossians">Colossians</option></select>
     <label>Chapter:</label>
-    <select id="fitb-chapter"></select>
+    <select id="fitb-chapter"><option value="0">All chapters</option><option value="1">Chapter 1</option><option value="2">Chapter 2</option><option value="3">Chapter 3</option><option value="4">Chapter 4</option><option value="5">Chapter 5</option><option value="6">Chapter 6</option><option value="7">Chapter 7</option><option value="8">Chapter 8</option><option value="9">Chapter 9</option><option value="10">Chapter 10</option><option value="11">Chapter 11</option><option value="12">Chapter 12</option><option value="13">Chapter 13</option><option value="14">Chapter 14</option><option value="15">Chapter 15</option><option value="16">Chapter 16</option><option value="17">Chapter 17</option><option value="18">Chapter 18</option><option value="19">Chapter 19</option><option value="20">Chapter 20</option><option value="21">Chapter 21</option></select>
     <label>Diff:</label>
     <select id="fitb-diff"><option value="medium">Med</option><option value="easy">Easy</option><option value="hard">Hard</option></select>
     <button class="btn btn-primary btn-sm" onclick="startFITB()" style="margin-left:auto">New ›</button>
@@ -413,9 +527,9 @@ body{font-family:'Source Sans 3','Segoe UI',Arial,sans-serif,'Segoe UI',Arial,sa
 <div id="screen-wordsearch" class="screen">
   <div class="filter-bar">
     <label>Book:</label>
-    <select id="ws-book" onchange="updateGameChapters('ws')"></select>
+    <select id="ws-book" onchange="updateGameChapters(&#39;ws&#39;)"><option value="John">John</option><option value="Proverbs">Proverbs</option><option value="Colossians">Colossians</option></select>
     <label>Chapter:</label>
-    <select id="ws-chapter"></select>
+    <select id="ws-chapter"><option value="0">All chapters</option><option value="1">Chapter 1</option><option value="2">Chapter 2</option><option value="3">Chapter 3</option><option value="4">Chapter 4</option><option value="5">Chapter 5</option><option value="6">Chapter 6</option><option value="7">Chapter 7</option><option value="8">Chapter 8</option><option value="9">Chapter 9</option><option value="10">Chapter 10</option><option value="11">Chapter 11</option><option value="12">Chapter 12</option><option value="13">Chapter 13</option><option value="14">Chapter 14</option><option value="15">Chapter 15</option><option value="16">Chapter 16</option><option value="17">Chapter 17</option><option value="18">Chapter 18</option><option value="19">Chapter 19</option><option value="20">Chapter 20</option><option value="21">Chapter 21</option></select>
     <button class="btn btn-primary btn-sm" onclick="startWordSearch()" style="margin-left:auto">New ›</button>
   </div>
   <div class="level-bar">
@@ -450,9 +564,9 @@ body{font-family:'Source Sans 3','Segoe UI',Arial,sans-serif,'Segoe UI',Arial,sa
 <div id="screen-scramble" class="screen">
   <div class="filter-bar">
     <label>Book:</label>
-    <select id="sc-book" onchange="updateGameChapters('sc')"></select>
+    <select id="sc-book" onchange="updateGameChapters(&#39;sc&#39;)"><option value="John">John</option><option value="Proverbs">Proverbs</option><option value="Colossians">Colossians</option></select>
     <label>Chapter:</label>
-    <select id="sc-chapter"></select>
+    <select id="sc-chapter"><option value="0">All chapters</option><option value="1">Chapter 1</option><option value="2">Chapter 2</option><option value="3">Chapter 3</option><option value="4">Chapter 4</option><option value="5">Chapter 5</option><option value="6">Chapter 6</option><option value="7">Chapter 7</option><option value="8">Chapter 8</option><option value="9">Chapter 9</option><option value="10">Chapter 10</option><option value="11">Chapter 11</option><option value="12">Chapter 12</option><option value="13">Chapter 13</option><option value="14">Chapter 14</option><option value="15">Chapter 15</option><option value="16">Chapter 16</option><option value="17">Chapter 17</option><option value="18">Chapter 18</option><option value="19">Chapter 19</option><option value="20">Chapter 20</option><option value="21">Chapter 21</option></select>
     <button class="btn btn-primary btn-sm" onclick="startScramble()" style="margin-left:auto">New ›</button>
   </div>
   <div class="level-bar">
@@ -506,6 +620,12 @@ body{font-family:'Source Sans 3','Segoe UI',Arial,sans-serif,'Segoe UI',Arial,sa
     <div class="today-date" id="devo-today-date"></div>
     <div class="week-dots" id="devo-week-dots"></div>
     <div class="streak-display">Current streak: <strong id="devo-streak-num">0</strong> days</div>
+    <div class="anchor-verse-wrap" id="anchor-verse-wrap">
+      <div class="anchor-label">✦ Today's Anchor Verse</div>
+      <button class="anchor-clear" onclick="clearAnchorVerse()" title="Remove">✕</button>
+      <div class="anchor-text" id="anchor-verse-text"></div>
+      <div class="anchor-ref" id="anchor-verse-ref"></div>
+    </div>
     <div class="encourage-bar" id="devo-encourage"></div>
     <button class="mark-btn mark" id="devo-mark-btn" onclick="toggleToday()">☀️ Mark Today Complete</button>
   </div>
@@ -518,7 +638,7 @@ body{font-family:'Source Sans 3','Segoe UI',Arial,sans-serif,'Segoe UI',Arial,sa
       <select class="goal-select" id="devo-goal-select" onchange="saveGoal()">
         <option value="3">3 days</option>
         <option value="4">4 days</option>
-        <option value="5" selected>5 days</option>
+        <option value="5" selected="">5 days</option>
         <option value="6">6 days</option>
         <option value="7">7 days</option>
       </select>
@@ -532,8 +652,18 @@ body{font-family:'Source Sans 3','Segoe UI',Arial,sans-serif,'Segoe UI',Arial,sa
   <div class="devo-card-inner">
     <div class="devo-section-title">🙏 Prayer &amp; Reflection</div>
     <div class="prayer-prompt" id="devo-prayer-prompt"></div>
-    <textarea class="prayer-textarea" id="devo-prayer-text" placeholder="Write your prayer or reflection here..." oninput="savePrayer()"></textarea>
-    <div class="prayer-save-note">Saves automatically ✓</div>
+    <div class="note-toolbar">
+      <button class="tag-btn" onclick="toggleTag(&#39;Prayer&#39;)" id="tag-Prayer">🙏 Prayer</button>
+      <button class="tag-btn" onclick="toggleTag(&#39;Gratitude&#39;)" id="tag-Gratitude">💛 Gratitude</button>
+      <button class="tag-btn" onclick="toggleTag(&#39;Answered&#39;)" id="tag-Answered">✅ Answered</button>
+      <button class="tag-btn" onclick="toggleTag(&#39;Conviction&#39;)" id="tag-Conviction">🔥 Conviction</button>
+      <button class="save-note-btn" onclick="saveNote()">Save Entry</button>
+    </div>
+    <textarea class="prayer-textarea" id="devo-prayer-text" placeholder="Write your prayer or reflection here..."></textarea>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:0.4rem;">
+      <span class="note-saved-flash" id="note-saved-flash">✓ Saved</span>
+      <span style="font-size:0.72rem;color:var(--text-muted)" id="note-char-count"></span>
+    </div>
   </div>
 
   <!-- MILESTONE BADGES -->
@@ -561,8 +691,8 @@ body{font-family:'Source Sans 3','Segoe UI',Arial,sans-serif,'Segoe UI',Arial,sa
     <div class="devo-section-title" style="justify-content:center">📖 Continue in the Word</div>
     <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1rem">Read a chapter, then test yourself with the games</p>
     <div style="display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap">
-      <button class="btn btn-primary btn-sm" onclick="navTo('read')">📖 Read Scripture</button>
-      <button class="btn btn-secondary btn-sm" onclick="navTo('fitb')">✏️ Play Games</button>
+      <button class="btn btn-primary btn-sm" onclick="navTo(&#39;read&#39;)">📖 Read Scripture</button>
+      <button class="btn btn-secondary btn-sm" onclick="navTo(&#39;fitb&#39;)">✏️ Play Games</button>
     </div>
   </div>
 
@@ -572,14 +702,14 @@ body{font-family:'Source Sans 3','Segoe UI',Arial,sans-serif,'Segoe UI',Arial,sa
 
 <!-- TRACKER -->
 <div id="screen-tracker" class="screen">
-  <h2 style="font-family:'Playfair Display',Georgia,'Times New Roman',serif;color:var(--navy);margin-bottom:1rem;font-size:1.4rem;">📊 Your Progress</h2>
+  <h2 style="font-family:&#39;Playfair Display&#39;,Georgia,&#39;Times New Roman&#39;,serif;color:var(--navy);margin-bottom:1rem;font-size:1.4rem;">📊 Your Progress</h2>
   <div class="tracker-grid" id="tracker-summary"></div>
   <div style="background:var(--white);border:1px solid #e0d5b8;border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem;">
-    <h3 style="font-family:'Playfair Display',Georgia,'Times New Roman',serif;color:var(--navy);margin-bottom:0.75rem;font-size:1rem;">Level Progress</h3>
+    <h3 style="font-family:&#39;Playfair Display&#39;,Georgia,&#39;Times New Roman&#39;,serif;color:var(--navy);margin-bottom:0.75rem;font-size:1rem;">Level Progress</h3>
     <div id="tracker-levels"></div>
   </div>
   <div style="background:var(--white);border:1px solid #e0d5b8;border-radius:var(--radius);padding:1.25rem;">
-    <h3 style="font-family:'Playfair Display',Georgia,'Times New Roman',serif;color:var(--navy);margin-bottom:0.75rem;font-size:1rem;">Recent Activity</h3>
+    <h3 style="font-family:&#39;Playfair Display&#39;,Georgia,&#39;Times New Roman&#39;,serif;color:var(--navy);margin-bottom:0.75rem;font-size:1rem;">Recent Activity</h3>
     <div id="tracker-activity" style="font-size:0.88rem;color:var(--text-muted);">No activity yet. Start playing!</div>
   </div>
   <div style="text-align:right;margin-top:0.75rem;">
@@ -596,7 +726,7 @@ body{font-family:'Source Sans 3','Segoe UI',Arial,sans-serif,'Segoe UI',Arial,sa
     <h2 id="lm-title">Level Complete!</h2>
     <p id="lm-msg"></p>
     <div style="background:var(--gold-pale);border-radius:var(--radius);padding:1rem;margin:0.75rem 0;">
-      <div style="font-size:1.4rem;font-weight:600;color:var(--navy);font-family:'Playfair Display',Georgia,'Times New Roman',serif" id="lm-score"></div>
+      <div style="font-size:1.4rem;font-weight:600;color:var(--navy);font-family:&#39;Playfair Display&#39;,Georgia,&#39;Times New Roman&#39;,serif" id="lm-score"></div>
       <div style="font-size:0.8rem;color:var(--text-muted);margin-top:0.2rem" id="lm-accuracy"></div>
     </div>
     <div class="modal-footer">
@@ -612,11 +742,11 @@ body{font-family:'Source Sans 3','Segoe UI',Arial,sans-serif,'Segoe UI',Arial,sa
     <h2>🖨️ Print Worksheet</h2>
     <div class="modal-row"><label>Type:</label>
       <select id="print-type"><option value="fitb">Fill in the Blank</option><option value="scramble">Verse Scramble</option><option value="wordsearch">Word Search</option></select></div>
-    <div class="modal-row"><label>Book:</label><select id="print-book"></select></div>
-    <div class="modal-row"><label>Chapter:</label><select id="print-chapter"></select></div>
+    <div class="modal-row"><label>Book:</label><select id="print-book"><option value="John">John</option><option value="Proverbs">Proverbs</option><option value="Colossians">Colossians</option></select></div>
+    <div class="modal-row"><label>Chapter:</label><select id="print-chapter"><option value="0">All chapters</option><option value="1">Chapter 1</option><option value="2">Chapter 2</option><option value="3">Chapter 3</option><option value="4">Chapter 4</option><option value="5">Chapter 5</option><option value="6">Chapter 6</option><option value="7">Chapter 7</option><option value="8">Chapter 8</option><option value="9">Chapter 9</option><option value="10">Chapter 10</option><option value="11">Chapter 11</option><option value="12">Chapter 12</option><option value="13">Chapter 13</option><option value="14">Chapter 14</option><option value="15">Chapter 15</option><option value="16">Chapter 16</option><option value="17">Chapter 17</option><option value="18">Chapter 18</option><option value="19">Chapter 19</option><option value="20">Chapter 20</option><option value="21">Chapter 21</option></select></div>
     <div class="modal-row"><label>Items:</label><input type="number" id="print-count" value="5" min="1" max="10" style="width:55px"></div>
     <div class="modal-row"><label>Title:</label><input type="text" id="print-title-text" value="Scripture Practice Worksheet"></div>
-    <div class="modal-row"><label>Name line:</label><input type="checkbox" id="print-nameline" checked style="width:auto"></div>
+    <div class="modal-row"><label>Name line:</label><input type="checkbox" id="print-nameline" checked="" style="width:auto"></div>
     <div class="modal-footer" style="margin-top:1rem">
       <button class="btn-ghost" onclick="closePrint()">Cancel</button>
       <button class="btn btn-primary" onclick="generateAndPrint()">Print</button>
@@ -626,6 +756,9 @@ body{font-family:'Source Sans 3','Segoe UI',Arial,sans-serif,'Segoe UI',Arial,sa
 
 <div id="print-output"></div>
 
+<script src="./Scripture Learning Games — ESV_files/firebase-app-compat.js.download"></script>
+<script src="./Scripture Learning Games — ESV_files/firebase-auth-compat.js.download"></script>
+<script src="./Scripture Learning Games — ESV_files/firebase-firestore-compat.js.download"></script>
 <script>
 // ═══════════════════════════════════════════════════════════════════════════
 //  DATA
@@ -714,7 +847,8 @@ function loadDevo() {
 }
 function defaultDevo() {
   return { completedDays:{}, streak:0, lastCompleted:null, weeklyGoal:5,
-           prayer:{}, qualifyingWeeks:0, earnedBadges:[], lastStreakCelebration:0, lastBadgeCelebration:-1 };
+           prayer:{}, noteTags:{}, anchorVerses:{},
+           qualifyingWeeks:0, earnedBadges:[], lastStreakCelebration:0, lastBadgeCelebration:-1 };
 }
 function saveDevo(d) { try{localStorage.setItem(DEVO_SK,JSON.stringify(d));}catch(e){} }
 
@@ -859,11 +993,13 @@ function renderDevotion() {
   const wlEl=document.getElementById('devo-week-label');
   if(wlEl) wlEl.textContent=`${weekDone} of ${goal} days completed this week`;
 
-  // Prayer
+  // Prayer & Note
   const ppEl=document.getElementById('devo-prayer-prompt');
   if(ppEl) ppEl.textContent=getDailyPrayerPrompt();
-  const ptEl=document.getElementById('devo-prayer-text');
-  if(ptEl) ptEl.value=devo.prayer[today]||'';
+  loadNoteForToday();
+
+  // Anchor verse
+  renderAnchorVerse(devo);
 
   // Badges
   const qw=calcQualifyingWeeks(devo.completedDays,goal);
@@ -908,7 +1044,9 @@ function renderCalendar(devo) {
     const done=!!devo.completedDays[key];
     const isToday=(d===todayNum);
     const isFuture=(d>todayNum);
-    html+=`<div class="cal-day has-date${done?' completed':''}${isToday?' today-cal':''}${isFuture?' future':''}" onclick="toggleCalDay('${key}')">${d}</div>`;
+    const hasNote=!!(devo.prayer&&devo.prayer[key]);
+    const hasAnchor=!!(devo.anchorVerses&&devo.anchorVerses[key]);
+    html+=`<div class="cal-day has-date${done?' completed':''}${isToday?' today-cal':''}${isFuture?' future':''}${hasNote?' has-note':''}${hasAnchor?' has-anchor':''}" onclick="${isFuture?'':isToday?`toggleCalDay('${key}')`:`openDayModal('${key}')`}">${d}</div>`;
   }
   calEl.innerHTML=html;
 }
@@ -920,6 +1058,49 @@ function toggleCalDay(key) {
   devo.completedDays[key]=!devo.completedDays[key];
   saveDevo(devo);
   renderDevotion();
+}
+
+function openDayModal(key) {
+  const devo=loadDevo();
+  const d=new Date(key+'T12:00:00');
+  const label=d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  document.getElementById('dm-title').textContent=label;
+
+  // Status badge
+  const done=!!devo.completedDays[key];
+  document.getElementById('dm-status').innerHTML=done
+    ?'<span class="day-modal-done">✅ Devotion Completed</span>'
+    :'<span style="font-size:0.82rem;color:var(--text-muted)">No devotion logged this day</span>';
+
+  // Anchor verse
+  const anchor=(devo.anchorVerses||{})[key];
+  const anchorSec=document.getElementById('dm-anchor-section');
+  if(anchor){
+    anchorSec.style.display='block';
+    document.getElementById('dm-anchor').innerHTML=
+      `<em>"${anchor.text}"</em><div style="margin-top:0.35rem;font-size:0.8rem;color:var(--sunrise-coral);font-weight:600">— ${anchor.ref}</div>`;
+  } else {
+    anchorSec.style.display='none';
+  }
+
+  // Note
+  const note=(devo.prayer||{})[key];
+  const noteTags=(devo.noteTags||{})[key]||[];
+  document.getElementById('dm-note').innerHTML=note
+    ?note.split('\n').join('<br>')
+    :'<span class="day-modal-empty">No note written this day</span>';
+  document.getElementById('dm-tags').innerHTML=noteTags.map(t=>
+    `<span class="day-modal-tag">${t}</span>`).join('');
+
+  // Prayer prompt (rotate by day of year)
+  const doy=Math.floor((d-(new Date(d.getFullYear(),0,0)))/(1000*60*60*24));
+  document.getElementById('dm-prompt').textContent=PRAYER_PROMPTS[doy%PRAYER_PROMPTS.length];
+
+  document.getElementById('day-modal').classList.add('open');
+}
+
+function closeDayModal(){
+  document.getElementById('day-modal').classList.remove('open');
 }
 
 // ── MARK TODAY ──
@@ -1235,12 +1416,17 @@ function renderReader() {
   if(!chData) { container.innerHTML='<p style="color:var(--text-muted)">Select a chapter to begin reading.</p>'; return; }
 
   const isPoetry = book === 'Proverbs';
-  const versesHtml = chData.map(([vnum, text]) =>
-    `<div class="reader-verse">
+  // Store verses in a map so onclick doesn't need to embed text
+  window._readerVerses = {};
+  const versesHtml = chData.map(([vnum, text], idx) => {
+    const key = `${book}_${chapter}_${vnum}`;
+    window._readerVerses[key] = {text, ref:`${book} ${chapter}:${vnum}`};
+    return `<div class="reader-verse">
       <span class="reader-verse-num">${vnum}</span>
       <span class="reader-verse-text${isPoetry?' poetry':''}">${text}</span>
-    </div>`
-  ).join('');
+      <button class="save-verse-btn" id="svbtn-${key}" onclick="saveAnchorVerseByKey('${key}')" title="Save as today's anchor verse">✦ Save</button>
+    </div>`;
+  }).join('');
 
   container.innerHTML = `
     <div class="reader-wrap">
@@ -1928,6 +2114,306 @@ document.addEventListener('mouseup',()=>{wsState.selecting=false;});
 renderHome();
 updateHomeDevoSummary();
 
+
+// ── NOTE TAGS ──
+let activeNoteTags = [];
+
+function toggleTag(tag) {
+  const btn = document.getElementById('tag-'+tag);
+  if(activeNoteTags.includes(tag)) {
+    activeNoteTags = activeNoteTags.filter(t=>t!==tag);
+    btn.classList.remove('active');
+  } else {
+    activeNoteTags.push(tag);
+    btn.classList.add('active');
+  }
+}
+
+function saveNote() {
+  const devo = loadDevo();
+  const today = todayKey();
+  const text = document.getElementById('devo-prayer-text').value.trim();
+  if(!text) return;
+
+  devo.prayer = devo.prayer||{};
+  devo.prayer[today] = text;
+  devo.noteTags = devo.noteTags||{};
+  devo.noteTags[today] = [...activeNoteTags];
+  saveDevo(devo);
+
+  // Flash saved confirmation
+  const flash = document.getElementById('note-saved-flash');
+  flash.classList.add('show');
+  setTimeout(()=>flash.classList.remove('show'), 2500);
+
+  // Re-render calendar to show note indicator
+  renderCalendar(devo);
+}
+
+function loadNoteForToday() {
+  const devo = loadDevo();
+  const today = todayKey();
+  const textarea = document.getElementById('devo-prayer-text');
+  if(textarea) textarea.value = (devo.prayer||{})[today]||'';
+
+  // Restore tags
+  activeNoteTags = (devo.noteTags||{})[today]||[];
+  ['Prayer','Gratitude','Answered','Conviction'].forEach(tag=>{
+    const btn=document.getElementById('tag-'+tag);
+    if(btn) btn.classList.toggle('active', activeNoteTags.includes(tag));
+  });
+
+  // Character count
+  const textarea2 = document.getElementById('devo-prayer-text');
+  if(textarea2) {
+    textarea2.addEventListener('input', ()=>{
+      const cc = document.getElementById('note-char-count');
+      if(cc) cc.textContent = textarea2.value.length + ' chars';
+    });
+  }
+}
+
+// ── ANCHOR VERSE ──
+function saveAnchorVerseByKey(key) {
+  const entry = window._readerVerses && window._readerVerses[key];
+  if(!entry) return;
+  saveAnchorVerse(entry.text, entry.ref, key);
+}
+
+function saveAnchorVerse(text, ref, btnKey) {
+  const devo = loadDevo();
+  const today = todayKey();
+  devo.anchorVerses = devo.anchorVerses||{};
+  devo.anchorVerses[today] = {text, ref};
+  saveDevo(devo);
+
+  // Update display
+  renderAnchorVerse(devo);
+
+  // Visual feedback on the specific button
+  const btnId = btnKey ? 'svbtn-'+btnKey : null;
+  const btn = btnId ? document.getElementById(btnId) : null;
+  if(btn) {
+    btn.textContent='✦ Saved!';
+    btn.classList.add('saved');
+    setTimeout(()=>{btn.textContent='✦ Save';btn.classList.remove('saved');},2000);
+  }
+
+  // Re-render calendar to show anchor indicator
+  renderCalendar(devo);
+}
+
+function clearAnchorVerse() {
+  const devo = loadDevo();
+  const today = todayKey();
+  if(devo.anchorVerses) delete devo.anchorVerses[today];
+  saveDevo(devo);
+  renderAnchorVerse(devo);
+}
+
+function renderAnchorVerse(devo) {
+  const today = todayKey();
+  const anchor = (devo.anchorVerses||{})[today];
+  const wrap = document.getElementById('anchor-verse-wrap');
+  const textEl = document.getElementById('anchor-verse-text');
+  const refEl = document.getElementById('anchor-verse-ref');
+  if(!wrap) return;
+  if(anchor) {
+    wrap.classList.add('show');
+    textEl.textContent = '"' + anchor.text + '"';
+    refEl.textContent = '— ' + anchor.ref;
+    // Also update header verse display
+    const hvd = document.getElementById('header-verse-display');
+    if(hvd) hvd.textContent = anchor.ref + ' — Your Anchor Verse';
+  } else {
+    wrap.classList.remove('show');
+  }
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  FIREBASE & SYNC
+// ═══════════════════════════════════════════════════════════════════════════
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCVSjk7IQaWtphRAZWg67k5tzneajiWrxs",
+  authDomain: "scripture-devotion-1e9de.firebaseapp.com",
+  projectId: "scripture-devotion-1e9de",
+  storageBucket: "scripture-devotion-1e9de.firebasestorage.app",
+  messagingSenderId: "534569944077",
+  appId: "1:534569944077:web:3203a7ebdd284913724144"
+};
+
+// Initialize Firebase
+firebase.initializeApp(FIREBASE_CONFIG);
+const fbAuth = firebase.auth();
+const fbDb = firebase.firestore();
+
+let currentUser = null;
+let syncTimeout = null;
+
+// ── AUTH FUNCTIONS ──
+function signInWithGoogle() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  fbAuth.signInWithPopup(provider).catch(err => {
+    console.error('Sign in error:', err);
+    alert('Sign in failed. Please try again.');
+  });
+}
+
+function signOut() {
+  if(confirm('Sign out of Scripture & Devotion?')) {
+    fbAuth.signOut();
+  }
+}
+
+// ── AUTH STATE LISTENER ──
+fbAuth.onAuthStateChanged(user => {
+  if(user) {
+    currentUser = user;
+    // Show app, hide auth overlay
+    document.getElementById('auth-overlay').classList.remove('show');
+    // Show user badge
+    const badge = document.getElementById('user-badge');
+    const avatar = document.getElementById('user-avatar');
+    const nameEl = document.getElementById('user-name');
+    badge.classList.add('show');
+    if(user.photoURL) avatar.src = user.photoURL;
+    nameEl.textContent = user.displayName || user.email;
+    // Load cloud data and merge with local
+    loadFromCloud();
+  } else {
+    currentUser = null;
+    document.getElementById('auth-overlay').classList.add('show');
+    document.getElementById('user-badge').classList.remove('show');
+  }
+});
+
+// ── CLOUD SAVE (debounced - waits 2s after last change) ──
+function schedulSync() {
+  if(!currentUser) return;
+  if(syncTimeout) clearTimeout(syncTimeout);
+  showSyncIndicator('↑ saving...');
+  syncTimeout = setTimeout(pushToCloud, 2000);
+}
+
+function showSyncIndicator(msg) {
+  const el = document.getElementById('sync-indicator');
+  if(el) { el.textContent = msg; el.classList.add('show'); }
+}
+function hideSyncIndicator() {
+  const el = document.getElementById('sync-indicator');
+  if(el) { el.classList.remove('show'); }
+  setTimeout(hideSyncIndicator2, 100);
+}
+function hideSyncIndicator2() {
+  const el = document.getElementById('sync-indicator');
+  if(el) el.classList.remove('show');
+}
+
+function pushToCloud() {
+  if(!currentUser) return;
+  const uid = currentUser.uid;
+  const devo = loadDevo();
+  const prog = loadProgress();
+
+  showSyncIndicator('↑ syncing');
+
+  // Save devotion data
+  fbDb.collection('users').doc(uid).collection('data').doc('devotion')
+    .set(devo, {merge: true})
+    .then(() => {
+      // Save game progress
+      return fbDb.collection('users').doc(uid).collection('data').doc('gameProgress')
+        .set(prog, {merge: true});
+    })
+    .then(() => {
+      showSyncIndicator('✓ saved');
+      setTimeout(() => hideSyncIndicator(), 2000);
+    })
+    .catch(err => {
+      console.error('Sync error:', err);
+      showSyncIndicator('⚠ sync failed');
+      setTimeout(() => hideSyncIndicator(), 3000);
+    });
+}
+
+function loadFromCloud() {
+  if(!currentUser) return;
+  const uid = currentUser.uid;
+  showSyncIndicator('↓ loading...');
+
+  fbDb.collection('users').doc(uid).collection('data').doc('devotion')
+    .get()
+    .then(doc => {
+      if(doc.exists) {
+        const cloudDevo = doc.data();
+        const localDevo = loadDevo();
+        // Merge: cloud wins for most things, but merge completedDays from both
+        const merged = Object.assign({}, localDevo, cloudDevo);
+        merged.completedDays = Object.assign({}, localDevo.completedDays, cloudDevo.completedDays);
+        merged.prayer = Object.assign({}, localDevo.prayer, cloudDevo.prayer||{});
+        merged.noteTags = Object.assign({}, localDevo.noteTags, cloudDevo.noteTags||{});
+        merged.anchorVerses = Object.assign({}, localDevo.anchorVerses, cloudDevo.anchorVerses||{});
+        merged.earnedBadges = [...new Set([...(localDevo.earnedBadges||[]), ...(cloudDevo.earnedBadges||[])])];
+        merged.streak = Math.max(localDevo.streak||0, cloudDevo.streak||0);
+        saveDevo(merged);
+      }
+      return fbDb.collection('users').doc(uid).collection('data').doc('gameProgress').get();
+    })
+    .then(doc => {
+      if(doc.exists) {
+        const cloudProg = doc.data();
+        const localProg = loadProgress();
+        // Merge: take higher values for scores/levels
+        const merged = Object.assign({}, localProg, cloudProg);
+        merged.fitb = mergeGameProgress(localProg.fitb, cloudProg.fitb);
+        merged.ws = mergeGameProgress(localProg.ws, cloudProg.ws);
+        merged.sc = mergeGameProgress(localProg.sc, cloudProg.sc);
+        saveProgress(merged);
+      }
+      showSyncIndicator('✓ loaded');
+      setTimeout(() => hideSyncIndicator(), 2000);
+      // Re-render current screen
+      renderHome();
+      updateHomeDevoSummary();
+    })
+    .catch(err => {
+      console.error('Load error:', err);
+      showSyncIndicator('⚠ load failed');
+      setTimeout(() => hideSyncIndicator(), 3000);
+    });
+}
+
+function mergeGameProgress(local, cloud) {
+  if(!cloud) return local;
+  if(!local) return cloud;
+  return {
+    score: Math.max(local.score||0, cloud.score||0),
+    streak: Math.max(local.streak||0, cloud.streak||0),
+    best: Math.max(local.best||0, cloud.best||0),
+    total: Math.max(local.total||0, cloud.total||0),
+    correct: Math.max(local.correct||0, cloud.correct||0),
+    level: Math.max(local.level||1, cloud.level||1),
+    gameInLevel: local.gameInLevel||0,
+    solved: Math.max(local.solved||0, cloud.solved||0),
+    chapters: Object.assign({}, local.chapters||{}, cloud.chapters||{})
+  };
+}
+
+// ── HOOK SAVE FUNCTIONS TO ALSO SYNC ──
+// Override saveDevo and saveProgress to trigger cloud sync
+const _origSaveDevo = saveDevo;
+saveDevo = function(d) {
+  _origSaveDevo(d);
+  schedulSync();
+};
+
+const _origSaveProgress = saveProgress;
+saveProgress = function(p) {
+  _origSaveProgress(p);
+  schedulSync();
+};
+
 </script>
 
 <!-- CELEBRATION OVERLAYS -->
@@ -1938,7 +2424,7 @@ updateHomeDevoSummary();
     <h2 id="cel-streak-title">5-Day Streak!</h2>
     <p id="cel-streak-msg">You are building a beautiful habit of seeking God daily.</p>
     <div class="cel-verse" id="cel-streak-verse"></div>
-    <button class="btn btn-primary" onclick="closeCelebration('streak-celebration')">Keep Going! ›</button>
+    <button class="btn btn-primary" onclick="closeCelebration(&#39;streak-celebration&#39;)">Keep Going! ›</button>
   </div>
 </div>
 <div class="celebration-overlay" id="badge-celebration">
@@ -1947,9 +2433,37 @@ updateHomeDevoSummary();
     <h2 id="cel-badge-title">Badge Earned!</h2>
     <p id="cel-badge-msg"></p>
     <div class="cel-verse" id="cel-badge-verse"></div>
-    <button class="btn btn-secondary" onclick="closeCelebration('badge-celebration')">Praise God! 🙏</button>
+    <button class="btn btn-secondary" onclick="closeCelebration(&#39;badge-celebration&#39;)">Praise God! 🙏</button>
   </div>
 </div>
 
-</body>
-</html>
+
+<!-- DAY DETAIL MODAL -->
+<div class="day-modal-backdrop" id="day-modal">
+  <div class="day-modal">
+    <div class="day-modal-header">
+      <div class="day-modal-title" id="dm-title">Tuesday, June 10</div>
+      <button class="day-modal-close" onclick="closeDayModal()">×</button>
+    </div>
+    <div id="dm-status" style="margin-bottom:1rem"></div>
+    <div class="day-modal-section" id="dm-anchor-section">
+      <div class="day-modal-label">✦ Anchor Verse</div>
+      <div class="day-modal-content" id="dm-anchor"></div>
+    </div>
+    <div class="day-modal-section">
+      <div class="day-modal-label">🙏 Note &amp; Reflection</div>
+      <div class="day-modal-content" id="dm-note"></div>
+      <div id="dm-tags" style="margin-top:0.5rem"></div>
+    </div>
+    <div class="day-modal-section" id="dm-prompt-section">
+      <div class="day-modal-label">💭 Prayer Prompt</div>
+      <div class="day-modal-content" id="dm-prompt"></div>
+    </div>
+    <div style="text-align:center;margin-top:1rem">
+      <button class="btn btn-primary btn-sm" onclick="closeDayModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+
+</body></html>
