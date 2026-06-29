@@ -426,7 +426,9 @@ body{font-family:'Source Sans 3','Segoe UI',Arial,sans-serif,'Segoe UI',Arial,sa
       Sign in with Google
     </button>
     <div id="auth-error-msg" style="font-size:0.78rem;color:#c0392b;margin-top:0.75rem;padding:0.5rem;background:#fdeaea;border-radius:8px;display:none"></div>
-    <div class="auth-note">Your data is private and only accessible to you. No passwords required.</div>
+    <div id="auth-error-msg" style="font-size:0.78rem;margin-top:0.75rem;padding:0.5rem 0.75rem;background:#e8f5ec;border-radius:8px;display:none;color:#2d7a3e;line-height:1.5;"></div>
+    <div class="auth-note" style="margin-top:0.75rem">Your data is private and only accessible to you.<br>No passwords required.</div>
+    <button onclick="skipSignIn()" style="margin-top:0.85rem;background:none;border:none;color:#aaa;font-size:0.78rem;cursor:pointer;text-decoration:underline;">Skip for now — use without sync</button>
   </div>
 </div>
 
@@ -740,29 +742,32 @@ body{font-family:'Source Sans 3','Segoe UI',Arial,sans-serif,'Segoe UI',Arial,sa
 <div id="print-output"></div>
 
 <script type="module">
-// Load Firebase modules
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut as fbSignOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, collection, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut as fbSignOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const FIREBASE_CONFIG = {
+const app = initializeApp({
   apiKey: "AIzaSyCVSjk7IQaWtphRAZWg67k5tzneajiWrxs",
   authDomain: "scripture-devotion-1e9de.firebaseapp.com",
   projectId: "scripture-devotion-1e9de",
   storageBucket: "scripture-devotion-1e9de.firebasestorage.app",
   messagingSenderId: "534569944077",
   appId: "1:534569944077:web:3203a7ebdd284913724144"
-};
+});
 
-const app = initializeApp(FIREBASE_CONFIG);
 const auth = getAuth(app);
 const db = getFirestore(app);
 let currentUser = null;
 let syncTimeout = null;
 
-function showAuthError(msg) {
+function showAuthMsg(msg, isError) {
   const el = document.getElementById('auth-error-msg');
-  if(el) { el.textContent = msg; el.style.display = 'block'; }
+  if(el) {
+    el.textContent = msg;
+    el.style.display = msg ? 'block' : 'none';
+    el.style.background = isError ? '#fdeaea' : '#e8f5ec';
+    el.style.color = isError ? '#c0392b' : '#2d7a3e';
+  }
 }
 
 function showSyncIndicator(msg) {
@@ -770,70 +775,65 @@ function showSyncIndicator(msg) {
   if(el) { el.textContent = msg; el.classList.add('show'); }
 }
 function hideSyncIndicator() {
-  const el = document.getElementById('sync-indicator');
-  if(el) el.classList.remove('show');
+  setTimeout(() => {
+    const el = document.getElementById('sync-indicator');
+    if(el) el.classList.remove('show');
+  }, 2000);
 }
 
-// Expose sign-in/out to global scope for onclick handlers
-window.signInWithGoogle = function() {
-  // Prevent redirect loop - don't redirect if already processing
-  if(handlingRedirect) return;
-  handlingRedirect = true;
-  showAuthError('Redirecting to Google sign-in...');
-  const provider = new GoogleAuthProvider();
-  signInWithRedirect(auth, provider).catch(err => {
-    handlingRedirect = false;
-    showAuthError('Error: ' + err.message);
-  });
+// Sign in with popup (works better than redirect on GitHub Pages)
+window.signInWithGoogle = async function() {
+  try {
+    showAuthMsg('Opening Google sign-in...', false);
+    const provider = new GoogleAuthProvider();
+    await signInWithPopup(auth, provider);
+    // onAuthStateChanged will handle the rest
+  } catch(err) {
+    console.error('Sign in error:', err.code, err.message);
+    if(err.code === 'auth/popup-blocked') {
+      showAuthMsg('Popup was blocked. Please allow popups for this site in your browser settings, then try again.', true);
+    } else if(err.code === 'auth/cancelled-popup-request' || err.code === 'auth/popup-closed-by-user') {
+      showAuthMsg('Sign-in cancelled. Try again when ready.', false);
+    } else {
+      showAuthMsg('Error: ' + err.message, true);
+    }
+  }
 };
 
 window.signOut = function() {
   if(confirm('Sign out?')) fbSignOut(auth);
 };
 
-// Handle redirect result - only process once, don't trigger another redirect
-let handlingRedirect = false;
-getRedirectResult(auth).then(result => {
-  if(result && result.user) {
-    console.log('Signed in via redirect:', result.user.email);
-    // onAuthStateChanged will handle the rest
-  }
-}).catch(err => {
-  if(err.code && err.code !== 'auth/no-auth-event' && err.code !== 'auth/null-user') {
-    console.error('Redirect error:', err.code);
-    showAuthError('Sign-in error: ' + err.message);
-  }
-});
-
-// Auth state - single source of truth
-let authInitialized = false;
+// Auth state listener
 onAuthStateChanged(auth, user => {
   if(user) {
     currentUser = user;
-    handlingRedirect = false;
-    // Hide sign-in overlay permanently
+    // Hide overlay, show app
     const overlay = document.getElementById('auth-overlay');
-    if(overlay) { overlay.classList.remove('show'); overlay.style.display = 'none'; }
-    // Show user badge
+    if(overlay) overlay.style.display = 'none';
+    // Show user info
     const badge = document.getElementById('user-badge');
-    const avatar = document.getElementById('user-avatar');
-    const nameEl = document.getElementById('user-name');
     if(badge) badge.classList.add('show');
+    const avatar = document.getElementById('user-avatar');
     if(avatar && user.photoURL) avatar.src = user.photoURL;
+    const nameEl = document.getElementById('user-name');
     if(nameEl) nameEl.textContent = user.displayName || user.email;
-    if(!authInitialized) { authInitialized = true; loadFromCloud(); }
+    // Load cloud data
+    loadFromCloud();
   } else {
     currentUser = null;
-    authInitialized = false;
-    // Only show overlay if not in middle of redirect
-    if(!handlingRedirect) {
-      const overlay = document.getElementById('auth-overlay');
-      if(overlay) { overlay.style.display = ''; overlay.classList.add('show'); }
-      const badge = document.getElementById('user-badge');
-      if(badge) badge.classList.remove('show');
-    }
+    const overlay = document.getElementById('auth-overlay');
+    if(overlay) overlay.style.display = 'flex';
+    const badge = document.getElementById('user-badge');
+    if(badge) badge.classList.remove('show');
   }
 });
+
+// Skip sign-in - use app without sync
+window.skipSignIn = function() {
+  const overlay = document.getElementById('auth-overlay');
+  if(overlay) overlay.style.display = 'none';
+};
 
 function schedulSync() {
   if(!currentUser) return;
@@ -844,16 +844,16 @@ function schedulSync() {
 
 async function pushToCloud() {
   if(!currentUser) return;
-  const uid = currentUser.uid;
-  showSyncIndicator('↑ syncing');
   try {
+    const uid = currentUser.uid;
     await setDoc(doc(db,'users',uid,'data','devotion'), loadDevo(), {merge:true});
     await setDoc(doc(db,'users',uid,'data','gameProgress'), loadProgress(), {merge:true});
     showSyncIndicator('✓ saved');
-    setTimeout(hideSyncIndicator, 2000);
+    hideSyncIndicator();
   } catch(err) {
+    console.error('Sync error:', err);
     showSyncIndicator('⚠ sync failed');
-    setTimeout(hideSyncIndicator, 3000);
+    hideSyncIndicator();
   }
 }
 
@@ -886,12 +886,13 @@ async function loadFromCloud() {
       localStorage.setItem(SK, JSON.stringify(merged));
     }
     showSyncIndicator('✓ synced');
-    setTimeout(hideSyncIndicator, 2000);
+    hideSyncIndicator();
     renderHome();
     updateHomeDevoSummary();
   } catch(err) {
+    console.error('Load error:', err);
     showSyncIndicator('⚠ load failed');
-    setTimeout(hideSyncIndicator, 3000);
+    hideSyncIndicator();
   }
 }
 
@@ -910,16 +911,15 @@ function mergeGameProgress(local, cloud) {
   };
 }
 
-// Hook save functions to trigger cloud sync
+// Hook save functions to sync after page loads
 window.addEventListener('load', () => {
-  const _origSaveDevo = window.saveDevo || saveDevo;
-  const origSave = saveDevo;
-  saveDevo = function(d) { origSave(d); schedulSync(); };
-  const origSaveProg = saveProgress;
-  saveProgress = function(p) { origSaveProg(p); schedulSync(); };
+  const origSaveDevo = saveDevo;
+  saveDevo = function(d) { origSaveDevo(d); schedulSync(); };
+  const origSaveProgress = saveProgress;
+  saveProgress = function(p) { origSaveProgress(p); schedulSync(); };
 });
-
 </script>
+
 <script>
 // ═══════════════════════════════════════════════════════════════════════════
 //  DATA
