@@ -739,9 +739,170 @@ body{font-family:'Source Sans 3','Segoe UI',Arial,sans-serif,'Segoe UI',Arial,sa
 
 <div id="print-output"></div>
 
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script type="module">
+// Load Firebase modules
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut as fbSignOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, collection, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCVSjk7IQaWtphRAZWg67k5tzneajiWrxs",
+  authDomain: "scripture-devotion-1e9de.firebaseapp.com",
+  projectId: "scripture-devotion-1e9de",
+  storageBucket: "scripture-devotion-1e9de.firebasestorage.app",
+  messagingSenderId: "534569944077",
+  appId: "1:534569944077:web:3203a7ebdd284913724144"
+};
+
+const app = initializeApp(FIREBASE_CONFIG);
+const auth = getAuth(app);
+const db = getFirestore(app);
+let currentUser = null;
+let syncTimeout = null;
+
+function showAuthError(msg) {
+  const el = document.getElementById('auth-error-msg');
+  if(el) { el.textContent = msg; el.style.display = 'block'; }
+}
+
+function showSyncIndicator(msg) {
+  const el = document.getElementById('sync-indicator');
+  if(el) { el.textContent = msg; el.classList.add('show'); }
+}
+function hideSyncIndicator() {
+  const el = document.getElementById('sync-indicator');
+  if(el) el.classList.remove('show');
+}
+
+// Expose sign-in/out to global scope for onclick handlers
+window.signInWithGoogle = function() {
+  showAuthError('Redirecting to Google sign-in...');
+  const provider = new GoogleAuthProvider();
+  signInWithRedirect(auth, provider).catch(err => {
+    showAuthError('Error: ' + err.message);
+  });
+};
+
+window.signOut = function() {
+  if(confirm('Sign out?')) fbSignOut(auth);
+};
+
+// Handle redirect result
+getRedirectResult(auth).then(result => {
+  if(result && result.user) {
+    console.log('Signed in:', result.user.email);
+  }
+}).catch(err => {
+  if(err.code !== 'auth/no-auth-event') {
+    showAuthError('Sign-in error: ' + err.message);
+  }
+});
+
+// Auth state
+onAuthStateChanged(auth, user => {
+  if(user) {
+    currentUser = user;
+    document.getElementById('auth-overlay').classList.remove('show');
+    const badge = document.getElementById('user-badge');
+    const avatar = document.getElementById('user-avatar');
+    const nameEl = document.getElementById('user-name');
+    if(badge) badge.classList.add('show');
+    if(avatar && user.photoURL) avatar.src = user.photoURL;
+    if(nameEl) nameEl.textContent = user.displayName || user.email;
+    loadFromCloud();
+  } else {
+    currentUser = null;
+    document.getElementById('auth-overlay').classList.add('show');
+    const badge = document.getElementById('user-badge');
+    if(badge) badge.classList.remove('show');
+  }
+});
+
+function schedulSync() {
+  if(!currentUser) return;
+  if(syncTimeout) clearTimeout(syncTimeout);
+  showSyncIndicator('↑ saving...');
+  syncTimeout = setTimeout(pushToCloud, 2000);
+}
+
+async function pushToCloud() {
+  if(!currentUser) return;
+  const uid = currentUser.uid;
+  showSyncIndicator('↑ syncing');
+  try {
+    await setDoc(doc(db,'users',uid,'data','devotion'), loadDevo(), {merge:true});
+    await setDoc(doc(db,'users',uid,'data','gameProgress'), loadProgress(), {merge:true});
+    showSyncIndicator('✓ saved');
+    setTimeout(hideSyncIndicator, 2000);
+  } catch(err) {
+    showSyncIndicator('⚠ sync failed');
+    setTimeout(hideSyncIndicator, 3000);
+  }
+}
+
+async function loadFromCloud() {
+  if(!currentUser) return;
+  const uid = currentUser.uid;
+  showSyncIndicator('↓ loading...');
+  try {
+    const devoDoc = await getDoc(doc(db,'users',uid,'data','devotion'));
+    if(devoDoc.exists()) {
+      const cloud = devoDoc.data();
+      const local = loadDevo();
+      const merged = Object.assign({}, local, cloud);
+      merged.completedDays = Object.assign({}, local.completedDays||{}, cloud.completedDays||{});
+      merged.prayer = Object.assign({}, local.prayer||{}, cloud.prayer||{});
+      merged.noteTags = Object.assign({}, local.noteTags||{}, cloud.noteTags||{});
+      merged.anchorVerses = Object.assign({}, local.anchorVerses||{}, cloud.anchorVerses||{});
+      merged.earnedBadges = [...new Set([...(local.earnedBadges||[]),...(cloud.earnedBadges||[])])];
+      merged.streak = Math.max(local.streak||0, cloud.streak||0);
+      localStorage.setItem(DEVO_SK, JSON.stringify(merged));
+    }
+    const progDoc = await getDoc(doc(db,'users',uid,'data','gameProgress'));
+    if(progDoc.exists()) {
+      const cloud = progDoc.data();
+      const local = loadProgress();
+      const merged = Object.assign({}, local, cloud);
+      merged.fitb = mergeGameProgress(local.fitb, cloud.fitb);
+      merged.ws = mergeGameProgress(local.ws, cloud.ws);
+      merged.sc = mergeGameProgress(local.sc, cloud.sc);
+      localStorage.setItem(SK, JSON.stringify(merged));
+    }
+    showSyncIndicator('✓ synced');
+    setTimeout(hideSyncIndicator, 2000);
+    renderHome();
+    updateHomeDevoSummary();
+  } catch(err) {
+    showSyncIndicator('⚠ load failed');
+    setTimeout(hideSyncIndicator, 3000);
+  }
+}
+
+function mergeGameProgress(local, cloud) {
+  if(!cloud) return local||{};
+  if(!local) return cloud;
+  return {
+    score: Math.max(local.score||0, cloud.score||0),
+    streak: Math.max(local.streak||0, cloud.streak||0),
+    best: Math.max(local.best||0, cloud.best||0),
+    total: Math.max(local.total||0, cloud.total||0),
+    correct: Math.max(local.correct||0, cloud.correct||0),
+    level: Math.max(local.level||1, cloud.level||1),
+    gameInLevel: local.gameInLevel||0,
+    solved: Math.max(local.solved||0, cloud.solved||0),
+  };
+}
+
+// Hook save functions to trigger cloud sync
+window.addEventListener('load', () => {
+  const _origSaveDevo = window.saveDevo || saveDevo;
+  const origSave = saveDevo;
+  saveDevo = function(d) { origSave(d); schedulSync(); };
+  const origSaveProg = saveProgress;
+  saveProgress = function(p) { origSaveProg(p); schedulSync(); };
+});
+
+</script>
 <script>
 // ═══════════════════════════════════════════════════════════════════════════
 //  DATA
@@ -2214,185 +2375,6 @@ function renderAnchorVerse(devo) {
 }
 
 
-// ═══════════════════════════════════════════════════════════════════════════
-//  FIREBASE & SYNC
-// ═══════════════════════════════════════════════════════════════════════════
-const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyCVSjk7IQaWtphRAZWg67k5tzneajiWrxs",
-  authDomain: "scripture-devotion-1e9de.firebaseapp.com",
-  projectId: "scripture-devotion-1e9de",
-  storageBucket: "scripture-devotion-1e9de.firebasestorage.app",
-  messagingSenderId: "534569944077",
-  appId: "1:534569944077:web:3203a7ebdd284913724144"
-};
-
-let fbApp, fbAuth, fbDb, currentUser = null, syncTimeout = null;
-
-function showAuthError(msg) {
-  const el = document.getElementById('auth-error-msg');
-  if(el) { el.textContent = msg; el.style.display = 'block'; }
-}
-
-function initFirebase() {
-  try {
-    fbApp = firebase.initializeApp(FIREBASE_CONFIG);
-    fbAuth = firebase.auth();
-    fbDb = firebase.firestore();
-
-    // Check for redirect result first (comes back after Google sign-in)
-    fbAuth.getRedirectResult().then(result => {
-      if(result && result.user) {
-        console.log('Redirect sign-in success:', result.user.email);
-      }
-    }).catch(err => {
-      if(err.code && err.code !== 'auth/no-auth-event') {
-        console.error('Redirect error:', err.code, err.message);
-        showAuthError('Sign-in error: ' + err.message);
-      }
-    });
-
-    // Listen for auth state changes
-    fbAuth.onAuthStateChanged(user => {
-      if(user) {
-        currentUser = user;
-        document.getElementById('auth-overlay').classList.remove('show');
-        const badge = document.getElementById('user-badge');
-        const avatar = document.getElementById('user-avatar');
-        const nameEl = document.getElementById('user-name');
-        if(badge) badge.classList.add('show');
-        if(avatar && user.photoURL) avatar.src = user.photoURL;
-        if(nameEl) nameEl.textContent = user.displayName || user.email;
-        loadFromCloud();
-      } else {
-        currentUser = null;
-        document.getElementById('auth-overlay').classList.add('show');
-        const badge = document.getElementById('user-badge');
-        if(badge) badge.classList.remove('show');
-      }
-    });
-
-  } catch(err) {
-    console.error('Firebase init error:', err);
-    showAuthError('Firebase failed to load: ' + err.message);
-  }
-}
-
-function signInWithGoogle() {
-  if(!fbAuth) { showAuthError('App still loading, please wait...'); return; }
-  showAuthError('Redirecting to Google sign-in...');
-  const provider = new firebase.auth.GoogleAuthProvider();
-  fbAuth.signInWithRedirect(provider).catch(err => {
-    console.error('Sign in error:', err);
-    showAuthError('Error: ' + err.message);
-  });
-}
-
-function signOut() {
-  if(!fbAuth) return;
-  if(confirm('Sign out of Scripture & Devotion?')) {
-    fbAuth.signOut();
-  }
-}
-
-function showSyncIndicator(msg) {
-  const el = document.getElementById('sync-indicator');
-  if(el) { el.textContent = msg; el.classList.add('show'); }
-}
-function hideSyncIndicator() {
-  const el = document.getElementById('sync-indicator');
-  if(el) el.classList.remove('show');
-}
-
-function schedulSync() {
-  if(!currentUser) return;
-  if(syncTimeout) clearTimeout(syncTimeout);
-  showSyncIndicator('↑ saving...');
-  syncTimeout = setTimeout(pushToCloud, 2000);
-}
-
-function pushToCloud() {
-  if(!currentUser || !fbDb) return;
-  const uid = currentUser.uid;
-  showSyncIndicator('↑ syncing');
-  Promise.all([
-    fbDb.collection('users').doc(uid).collection('data').doc('devotion').set(loadDevo(), {merge:true}),
-    fbDb.collection('users').doc(uid).collection('data').doc('gameProgress').set(loadProgress(), {merge:true})
-  ]).then(() => {
-    showSyncIndicator('✓ saved');
-    setTimeout(hideSyncIndicator, 2000);
-  }).catch(err => {
-    console.error('Sync error:', err);
-    showSyncIndicator('⚠ sync failed');
-    setTimeout(hideSyncIndicator, 3000);
-  });
-}
-
-function loadFromCloud() {
-  if(!currentUser || !fbDb) return;
-  const uid = currentUser.uid;
-  showSyncIndicator('↓ loading...');
-  fbDb.collection('users').doc(uid).collection('data').doc('devotion').get().then(doc => {
-    if(doc.exists) {
-      const cloud = doc.data();
-      const local = loadDevo();
-      const merged = Object.assign({}, local, cloud);
-      merged.completedDays = Object.assign({}, local.completedDays||{}, cloud.completedDays||{});
-      merged.prayer = Object.assign({}, local.prayer||{}, cloud.prayer||{});
-      merged.noteTags = Object.assign({}, local.noteTags||{}, cloud.noteTags||{});
-      merged.anchorVerses = Object.assign({}, local.anchorVerses||{}, cloud.anchorVerses||{});
-      merged.earnedBadges = [...new Set([...(local.earnedBadges||[]),...(cloud.earnedBadges||[])])];
-      merged.streak = Math.max(local.streak||0, cloud.streak||0);
-      localStorage.setItem(DEVO_SK, JSON.stringify(merged));
-    }
-    return fbDb.collection('users').doc(uid).collection('data').doc('gameProgress').get();
-  }).then(doc => {
-    if(doc.exists) {
-      const cloud = doc.data();
-      const local = loadProgress();
-      const merged = Object.assign({}, local, cloud);
-      merged.fitb = mergeGameProgress(local.fitb, cloud.fitb);
-      merged.ws = mergeGameProgress(local.ws, cloud.ws);
-      merged.sc = mergeGameProgress(local.sc, cloud.sc);
-      localStorage.setItem(SK, JSON.stringify(merged));
-    }
-    showSyncIndicator('✓ synced');
-    setTimeout(hideSyncIndicator, 2000);
-    renderHome();
-    updateHomeDevoSummary();
-  }).catch(err => {
-    console.error('Load error:', err);
-    showSyncIndicator('⚠ load failed');
-    setTimeout(hideSyncIndicator, 3000);
-  });
-}
-
-function mergeGameProgress(local, cloud) {
-  if(!cloud) return local||{};
-  if(!local) return cloud;
-  return {
-    score: Math.max(local.score||0, cloud.score||0),
-    streak: Math.max(local.streak||0, cloud.streak||0),
-    best: Math.max(local.best||0, cloud.best||0),
-    total: Math.max(local.total||0, cloud.total||0),
-    correct: Math.max(local.correct||0, cloud.correct||0),
-    level: Math.max(local.level||1, cloud.level||1),
-    gameInLevel: local.gameInLevel||0,
-    solved: Math.max(local.solved||0, cloud.solved||0),
-  };
-}
-
-// Hook save functions to trigger cloud sync
-const _origSaveDevo = saveDevo;
-saveDevo = function(d) { _origSaveDevo(d); schedulSync(); };
-const _origSaveProgress = saveProgress;
-saveProgress = function(p) { _origSaveProgress(p); schedulSync(); };
-
-// Initialize Firebase when DOM is ready
-if(document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initFirebase);
-} else {
-  initFirebase();
-}
 </script>
 
 <!-- CELEBRATION OVERLAYS -->
