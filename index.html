@@ -776,9 +776,13 @@ function hideSyncIndicator() {
 
 // Expose sign-in/out to global scope for onclick handlers
 window.signInWithGoogle = function() {
+  // Prevent redirect loop - don't redirect if already processing
+  if(handlingRedirect) return;
+  handlingRedirect = true;
   showAuthError('Redirecting to Google sign-in...');
   const provider = new GoogleAuthProvider();
   signInWithRedirect(auth, provider).catch(err => {
+    handlingRedirect = false;
     showAuthError('Error: ' + err.message);
   });
 };
@@ -787,34 +791,47 @@ window.signOut = function() {
   if(confirm('Sign out?')) fbSignOut(auth);
 };
 
-// Handle redirect result
+// Handle redirect result - only process once, don't trigger another redirect
+let handlingRedirect = false;
 getRedirectResult(auth).then(result => {
   if(result && result.user) {
-    console.log('Signed in:', result.user.email);
+    console.log('Signed in via redirect:', result.user.email);
+    // onAuthStateChanged will handle the rest
   }
 }).catch(err => {
-  if(err.code !== 'auth/no-auth-event') {
+  if(err.code && err.code !== 'auth/no-auth-event' && err.code !== 'auth/null-user') {
+    console.error('Redirect error:', err.code);
     showAuthError('Sign-in error: ' + err.message);
   }
 });
 
-// Auth state
+// Auth state - single source of truth
+let authInitialized = false;
 onAuthStateChanged(auth, user => {
   if(user) {
     currentUser = user;
-    document.getElementById('auth-overlay').classList.remove('show');
+    handlingRedirect = false;
+    // Hide sign-in overlay permanently
+    const overlay = document.getElementById('auth-overlay');
+    if(overlay) { overlay.classList.remove('show'); overlay.style.display = 'none'; }
+    // Show user badge
     const badge = document.getElementById('user-badge');
     const avatar = document.getElementById('user-avatar');
     const nameEl = document.getElementById('user-name');
     if(badge) badge.classList.add('show');
     if(avatar && user.photoURL) avatar.src = user.photoURL;
     if(nameEl) nameEl.textContent = user.displayName || user.email;
-    loadFromCloud();
+    if(!authInitialized) { authInitialized = true; loadFromCloud(); }
   } else {
     currentUser = null;
-    document.getElementById('auth-overlay').classList.add('show');
-    const badge = document.getElementById('user-badge');
-    if(badge) badge.classList.remove('show');
+    authInitialized = false;
+    // Only show overlay if not in middle of redirect
+    if(!handlingRedirect) {
+      const overlay = document.getElementById('auth-overlay');
+      if(overlay) { overlay.style.display = ''; overlay.classList.add('show'); }
+      const badge = document.getElementById('user-badge');
+      if(badge) badge.classList.remove('show');
+    }
   }
 });
 
