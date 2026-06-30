@@ -651,12 +651,10 @@ body{font-family:'Source Sans 3','Segoe UI',Arial,sans-serif,'Segoe UI',Arial,sa
     </div>
   </div>
 
-  <!-- MILESTONE BADGES -->
+  <!-- BADGES -->
   <div class="devo-card-inner">
-    <div class="devo-section-title">🏆 Milestone Badges</div>
-    <div class="badge-progress-text" id="devo-badge-progress-text"></div>
-    <div class="badge-progress-bar"><div class="badge-progress-fill" id="devo-badge-fill" style="width:0%"></div></div>
-    <div class="badges-grid" id="devo-badges-grid"></div>
+    <div class="devo-section-title">🏆 Badges &amp; Achievements</div>
+    <div id="devo-badges-grid"></div>
   </div>
 
   <!-- THIS MONTH -->
@@ -1162,33 +1160,12 @@ function renderDevotion() {
   // Anchor verse
   renderAnchorVerse(devo);
 
-  // Badges
-  const qw=calcQualifyingWeeks(devo.completedDays,goal);
-  const nextBadge=BADGES.find(b=>!devo.earnedBadges.includes(b.name));
-  const bpEl=document.getElementById('devo-badge-progress-text');
-  if(bpEl) {
-    if(nextBadge) bpEl.textContent=`${qw} qualifying week${qw!==1?'s':''} — ${Math.max(0,nextBadge.weeks-qw)} more to earn "${nextBadge.name}"`;
-    else bpEl.textContent='All badges earned! Amazing faithfulness! 🏆';
-  }
-  const bfEl=document.getElementById('devo-badge-fill');
-  if(bfEl&&nextBadge) bfEl.style.width=Math.min(100,Math.round((qw/nextBadge.weeks)*100))+'%';
-
-  const bgEl=document.getElementById('devo-badges-grid');
-  if(bgEl) {
-    bgEl.innerHTML=BADGES.map(b=>{
-      const earned=devo.earnedBadges.includes(b.name)||(qw>=b.weeks);
-      return `<div class="badge-item">
-        <div class="badge-circle ${earned?'earned':'locked'}">${b.icon}</div>
-        <div class="badge-name ${earned?'earned':''}">${b.name}</div>
-      </div>`;
-    }).join('');
-  }
+  // Badges - new 3D badge system
+  renderBadges2(devo, loadProgress());
+  checkAllBadges();
 
   // Calendar
   renderCalendar(devo);
-
-  // Auto-earn badges
-  autoEarnBadges(devo, qw);
 }
 
 function renderCalendar(devo) {
@@ -1779,6 +1756,7 @@ function checkFITB(btn, chosen, correct) {
 }
 
 function advanceFITB() {
+  checkAllBadges();
   if(fitbState.gameInLevel >= GAMES_PER_LEVEL) {
     // Level complete
     const level = fitbState.level;
@@ -1977,6 +1955,7 @@ function wsCheckWord(word,sel){
 }
 
 function advanceWS(){
+  checkAllBadges();
   if(wsState.gameInLevel>=GAMES_PER_LEVEL){
     const level=wsState.level;
     pendingNextLevel=()=>{
@@ -2089,6 +2068,7 @@ function checkScramble(){
 }
 
 function advanceScramble(){
+  checkAllBadges();
   if(scState.gameInLevel>=GAMES_PER_LEVEL){
     const level=scState.level;
     pendingNextLevel=()=>{
@@ -2307,6 +2287,9 @@ function saveNote() {
   flash.classList.add('show');
   setTimeout(()=>flash.classList.remove('show'), 2500);
 
+  // Check journal streak badges
+  checkAllBadges();
+
   // Re-render calendar to show note indicator
   renderCalendar(devo);
 }
@@ -2391,6 +2374,224 @@ function renderAnchorVerse(devo) {
   }
 }
 
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  BADGE SVG GENERATORS
+// ═══════════════════════════════════════════════════════════════════════════
+
+function svgSunBadge(earned) {
+  const gold='#f7c948',dark='#c8900a',light='#fff5c0';
+  const glow=earned?`<circle cx="36" cy="36" r="30" fill="${gold}" opacity="0.2"/>`:'';
+  const rays=[0,45,90,135,180,225,270,315].map(a=>{
+    const rad=a*Math.PI/180,r1=24,r2=28;
+    return `<line x1="${(36+r1*Math.sin(rad)).toFixed(1)}" y1="${(36-r1*Math.cos(rad)).toFixed(1)}" x2="${(36+r2*Math.sin(rad)).toFixed(1)}" y2="${(36-r2*Math.cos(rad)).toFixed(1)}" stroke="${dark}" stroke-width="3" stroke-linecap="round"/>`;
+  }).join('');
+  const check=earned?`<path d="M26 36 L32 43 L48 28" stroke="${dark}" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`:'';
+  const dim=earned?'':`<circle cx="36" cy="36" r="30" fill="rgba(0,0,0,0.5)"/>`;
+  return `<svg width="72" height="72" viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg">${glow}<circle cx="36" cy="36" r="26" fill="${dark}"/><circle cx="36" cy="36" r="24" fill="${gold}"/><circle cx="36" cy="36" r="18" fill="${light}"/>${rays}${check}${dim}</svg>`;
+}
+
+function svgShieldBadge(earned) {
+  const rim='#c8900a',mid='#f0b820',top='#f7c948',inner='#fff8dc';
+  const glow=earned?`<ellipse cx="36" cy="74" rx="22" ry="5" fill="${top}" opacity="0.35"/>`:'';
+  const check=earned?`<path d="M26 38 L32 45 L48 27" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`:'';
+  const dim=earned?'':`<path d="M36 8 L62 18 L62 40 Q62 62 36 74 Q10 62 10 40 L10 18 Z" fill="rgba(0,0,0,0.5)"/>`;
+  return `<svg width="72" height="80" viewBox="0 0 72 80" xmlns="http://www.w3.org/2000/svg">${glow}<path d="M36 8 L62 18 L62 40 Q62 62 36 74 Q10 62 10 40 L10 18 Z" fill="${rim}"/><path d="M36 12 L58 21 L58 40 Q58 60 36 70 Q14 60 14 40 L14 21 Z" fill="${mid}"/><path d="M36 16 L54 24 L54 40 Q54 57 36 66 Q18 57 18 40 L18 24 Z" fill="${top}"/><path d="M36 16 L54 24 L54 32 Q36 30 18 32 L18 24 Z" fill="${inner}" opacity="0.4"/>${check}${dim}</svg>`;
+}
+
+function svgStarBadge(c1, c2, shine, tier, earned) {
+  const pts=[];
+  for(let i=0;i<5;i++){
+    const a=i*72-90,b=a+36,R=22,r=10;
+    pts.push(`${(36+R*Math.cos(a*Math.PI/180)).toFixed(1)},${(36+R*Math.sin(a*Math.PI/180)).toFixed(1)}`);
+    pts.push(`${(36+r*Math.cos(b*Math.PI/180)).toFixed(1)},${(36+r*Math.sin(b*Math.PI/180)).toFixed(1)}`);
+  }
+  const star=pts.join(' ');
+  const half=pts.slice(0,6).join(' ');
+  const glow=earned?`<circle cx="36" cy="36" r="30" fill="${c1}" opacity="0.2"/>`:'';
+  const dim=earned?'':`<circle cx="36" cy="36" r="28" fill="rgba(0,0,0,0.5)"/>`;
+  return `<svg width="72" height="72" viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg">${glow}<circle cx="36" cy="36" r="28" fill="${c2}"/><circle cx="36" cy="36" r="26" fill="${c1}"/><polygon points="${star}" fill="${c2}"/><polygon points="${half}" fill="${shine}" opacity="0.3"/><text x="36" y="41" text-anchor="middle" font-family="sans-serif" font-size="12" fill="white" font-weight="bold">${tier}</text>${dim}</svg>`;
+}
+
+function svgPenBadge(earned) {
+  const col='#f4845f',tip='#c8600a';
+  const glow=earned?`<ellipse cx="36" cy="70" rx="18" ry="4" fill="${col}" opacity="0.3"/>`:'';
+  const dim=earned?'':`<rect x="27" y="13" width="18" height="58" rx="4" fill="rgba(0,0,0,0.5)"/>`;
+  return `<svg width="72" height="76" viewBox="0 0 72 76" xmlns="http://www.w3.org/2000/svg">${glow}<rect x="29" y="16" width="14" height="36" rx="4" fill="${col}"/><rect x="29" y="16" width="14" height="8" rx="4" fill="white" opacity="0.25"/><rect x="27" y="52" width="18" height="6" rx="2" fill="${tip}"/><path d="M29 58 L36 70 L43 58 Z" fill="${tip}"/><path d="M32 58 L36 65 L40 58 Z" fill="rgba(0,0,0,0.2)"/><rect x="31" y="13" width="10" height="6" rx="3" fill="${tip}"/>${dim}</svg>`;
+}
+
+function svgCrownBadge(earned) {
+  const rim='#f7c948',face='#f0b820';
+  const glow=earned?`<ellipse cx="36" cy="70" rx="24" ry="5" fill="${rim}" opacity="0.4"/>`:'';
+  const dim=earned?'':`<rect x="7" y="22" width="58" height="42" fill="rgba(0,0,0,0.5)" rx="3"/>`;
+  return `<svg width="72" height="76" viewBox="0 0 72 76" xmlns="http://www.w3.org/2000/svg">${glow}<path d="M8 54 L8 36 L20 47 L36 24 L52 47 L64 36 L64 54 Z" fill="${rim}"/><path d="M10 52 L10 38 L21 48 L36 27 L51 48 L62 38 L62 52 Z" fill="${face}"/><rect x="8" y="52" width="56" height="12" rx="3" fill="${rim}"/><rect x="10" y="54" width="52" height="8" rx="2" fill="${face}" opacity="0.7"/><rect x="12" y="54" width="48" height="4" rx="1" fill="white" opacity="0.2"/><circle cx="36" cy="36" r="5" fill="#e04040"/><circle cx="36" cy="36" r="3" fill="white" opacity="0.35"/><circle cx="18" cy="49" r="4" fill="#4080e0"/><circle cx="54" cy="49" r="4" fill="#40c060"/><circle cx="20" cy="58" r="2.5" fill="white" opacity="0.4"/><circle cx="36" cy="58" r="2.5" fill="white" opacity="0.4"/><circle cx="52" cy="58" r="2.5" fill="white" opacity="0.4"/>${dim}</svg>`;
+}
+
+// ── NEW BADGE DEFINITIONS ──────────────────────────────────────────────────
+const BADGE_DEFS = {
+  // Daily devotion - today complete
+  daily: {
+    name: 'Daily Devotion',
+    desc: "Completed today's devotion",
+    verse: 'This is the day the Lord has made; rejoice and be glad in it. — Psalm 118:24',
+    svgFn: (earned) => svgSunBadge(earned)
+  },
+  // Weekly goal
+  weekly: {
+    name: 'Weekly Goal',
+    desc: "Hit your weekly devotion goal",
+    verse: 'Blessed is the man who walks not in the counsel of the wicked. — Psalm 1:1',
+    svgFn: (earned) => svgShieldBadge(earned)
+  },
+  // Game badges - per game per 3 levels
+  fitb3:  {name:'Fill-in Blank III', desc:'Reached level 3', verse:'Your word is a lamp to my feet. — Psalm 119:105', svgFn:(e)=>svgStarBadge('#4a90d9','#2c6fad','#b0d4f8','III',e)},
+  fitb6:  {name:'Fill-in Blank VI',  desc:'Reached level 6', verse:'The entrance of your words gives light. — Psalm 119:130', svgFn:(e)=>svgStarBadge('#4a90d9','#2c6fad','#b0d4f8','VI',e)},
+  fitb9:  {name:'Fill-in Blank IX',  desc:'Reached level 9', verse:'Man shall not live by bread alone, but by every word. — Matthew 4:4', svgFn:(e)=>svgStarBadge('#4a90d9','#2c6fad','#b0d4f8','IX',e)},
+  ws3:    {name:'Word Search III',   desc:'Reached level 3', verse:'Seek and you will find. — Matthew 7:7', svgFn:(e)=>svgStarBadge('#8b5cf6','#6d28d9','#c4b5fd','III',e)},
+  ws6:    {name:'Word Search VI',    desc:'Reached level 6', verse:'Search the scriptures. — John 5:39', svgFn:(e)=>svgStarBadge('#8b5cf6','#6d28d9','#c4b5fd','VI',e)},
+  ws9:    {name:'Word Search IX',    desc:'Reached level 9', verse:'Those who seek the Lord lack no good thing. — Psalm 34:10', svgFn:(e)=>svgStarBadge('#8b5cf6','#6d28d9','#c4b5fd','IX',e)},
+  sc3:    {name:'Scramble III',      desc:'Reached level 3', verse:'Let the word of Christ dwell in you richly. — Colossians 3:16', svgFn:(e)=>svgStarBadge('#10b981','#047857','#a7f3d0','III',e)},
+  sc6:    {name:'Scramble VI',       desc:'Reached level 6', verse:'I have stored up your word in my heart. — Psalm 119:11', svgFn:(e)=>svgStarBadge('#10b981','#047857','#a7f3d0','VI',e)},
+  sc9:    {name:'Scramble IX',       desc:'Reached level 9', verse:'Your words were found and I ate them. — Jeremiah 15:16', svgFn:(e)=>svgStarBadge('#10b981','#047857','#a7f3d0','IX',e)},
+  // Journal streak badges
+  journal4:  {name:'Journal Streak 4',  desc:'4-day journal streak', verse:'Write the vision; make it plain. — Habakkuk 2:2', svgFn:(e)=>svgPenBadge(e)},
+  journal8:  {name:'Journal Streak 8',  desc:'8-day journal streak', verse:'Pour out your heart before him. — Psalm 62:8', svgFn:(e)=>svgPenBadge(e)},
+  journal16: {name:'Journal Streak 16', desc:'16-day journal streak', verse:'Evening and morning and at noon I will pray. — Psalm 55:17', svgFn:(e)=>svgCrownBadge(e)},
+};
+
+// Badge check logic - called after any relevant action
+function checkAllBadges() {
+  const devo = loadDevo();
+  const prog = loadProgress();
+  const newBadges = [];
+
+  // Weekly goal check
+  const goal = parseInt(devo.weeklyGoal)||5;
+  const now = new Date();
+  const weekStart = new Date(now); weekStart.setDate(now.getDate()-now.getDay());
+  let weekDone = 0;
+  for(let i=0;i<7;i++){const d=new Date(weekStart);d.setDate(weekStart.getDate()+i);if(devo.completedDays[dateKey(d)])weekDone++;}
+  if(weekDone>=goal && !isBadgeEarned('weekly',devo)) newBadges.push('weekly');
+
+  // Game level badges
+  const fitbLv = prog.fitb?.level||1;
+  const wsLv   = prog.ws?.level||1;
+  const scLv   = prog.sc?.level||1;
+  if(fitbLv>=3  && !isBadgeEarned('fitb3',devo))  newBadges.push('fitb3');
+  if(fitbLv>=6  && !isBadgeEarned('fitb6',devo))  newBadges.push('fitb6');
+  if(fitbLv>=9  && !isBadgeEarned('fitb9',devo))  newBadges.push('fitb9');
+  if(wsLv>=3    && !isBadgeEarned('ws3',devo))     newBadges.push('ws3');
+  if(wsLv>=6    && !isBadgeEarned('ws6',devo))     newBadges.push('ws6');
+  if(wsLv>=9    && !isBadgeEarned('ws9',devo))     newBadges.push('ws9');
+  if(scLv>=3    && !isBadgeEarned('sc3',devo))     newBadges.push('sc3');
+  if(scLv>=6    && !isBadgeEarned('sc6',devo))     newBadges.push('sc6');
+  if(scLv>=9    && !isBadgeEarned('sc9',devo))     newBadges.push('sc9');
+
+  // Journal streak
+  const jStreak = calcJournalStreak(devo);
+  if(jStreak>=4  && !isBadgeEarned('journal4',devo))  newBadges.push('journal4');
+  if(jStreak>=8  && !isBadgeEarned('journal8',devo))  newBadges.push('journal8');
+  if(jStreak>=16 && !isBadgeEarned('journal16',devo)) newBadges.push('journal16');
+
+  // Award new badges
+  if(newBadges.length>0) {
+    devo.earnedBadges2 = devo.earnedBadges2||[];
+    newBadges.forEach(id => {
+      if(!devo.earnedBadges2.includes(id)) {
+        devo.earnedBadges2.push(id);
+        setTimeout(()=>showBadgeCelebration(BADGE_DEFS[id]), 600);
+      }
+    });
+    saveDevo(devo);
+  }
+}
+
+function isBadgeEarned(id, devo) {
+  return (devo.earnedBadges2||[]).includes(id);
+}
+
+function calcJournalStreak(devo) {
+  let streak=0;
+  const today=new Date();
+  const d=new Date(today);
+  while(true) {
+    const key=dateKey(d);
+    if((devo.prayer||{})[key] && (devo.prayer[key]||'').trim().length>0) {
+      streak++;
+      d.setDate(d.getDate()-1);
+    } else break;
+  }
+  return streak;
+}
+
+// ── RENDER BADGES ──────────────────────────────────────────────────────────
+function renderBadges2(devo, prog) {
+  const bgEl = document.getElementById('devo-badges-grid');
+  if(!bgEl) return;
+
+  const today = todayKey();
+  const todayDone = !!devo.completedDays[today];
+  const earnedIds = devo.earnedBadges2||[];
+
+  const sections = [
+    {
+      title: '☀️ Daily Devotion',
+      badges: [{id:'daily', earned:todayDone}]
+    },
+    {
+      title: '🛡️ Weekly Goal',
+      badges: [{id:'weekly', earned:earnedIds.includes('weekly')}]
+    },
+    {
+      title: '✏️ Fill in the Blank',
+      badges: [
+        {id:'fitb3', earned:earnedIds.includes('fitb3')},
+        {id:'fitb6', earned:earnedIds.includes('fitb6')},
+        {id:'fitb9', earned:earnedIds.includes('fitb9')},
+      ]
+    },
+    {
+      title: '🔍 Word Search',
+      badges: [
+        {id:'ws3', earned:earnedIds.includes('ws3')},
+        {id:'ws6', earned:earnedIds.includes('ws6')},
+        {id:'ws9', earned:earnedIds.includes('ws9')},
+      ]
+    },
+    {
+      title: '🔀 Scramble',
+      badges: [
+        {id:'sc3', earned:earnedIds.includes('sc3')},
+        {id:'sc6', earned:earnedIds.includes('sc6')},
+        {id:'sc9', earned:earnedIds.includes('sc9')},
+      ]
+    },
+    {
+      title: '📝 Journal Streak',
+      badges: [
+        {id:'journal4',  earned:earnedIds.includes('journal4')},
+        {id:'journal8',  earned:earnedIds.includes('journal8')},
+        {id:'journal16', earned:earnedIds.includes('journal16')},
+      ]
+    },
+  ];
+
+  bgEl.innerHTML = sections.map(s => `
+    <div style="margin-bottom:1rem">
+      <div style="font-size:0.75rem;font-weight:600;color:var(--text-muted,#888);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.5rem">${s.title}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end">
+        ${s.badges.map(b => {
+          const def = BADGE_DEFS[b.id];
+          return `<div style="display:flex;flex-direction:column;align-items:center;gap:4px;${b.earned?'':'filter:grayscale(1) opacity(0.35)'}">
+            ${def.svgFn(b.earned)}
+            <span style="font-size:10px;color:${b.earned?'var(--sunrise-coral,#f4845f)':'#aaa'};text-align:center;max-width:70px;line-height:1.3;font-weight:${b.earned?'600':'400'}">${def.name}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  `).join('');
+}
 
 </script>
 
