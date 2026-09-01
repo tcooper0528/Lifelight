@@ -521,6 +521,15 @@ h1,h2,h3,h4,h5,h6{font-family:var(--font-heading);font-weight:600;letter-spacing
 .home-devo-banner .verse-ref-sm{color:var(--gold-light) !important;}
 .verse-text .blank.active{outline:2px solid var(--gold);outline-offset:2px;background:var(--gold-pale);}
 .verse-text .blank.filled{border-bottom:2px solid var(--gold);color:var(--gold-light);font-weight:700;padding:0 .35rem;}
+
+/* ===== PATCH: readable text on dark (black) fills ===== */
+.score-bar{background:#16232f !important;}
+.score-bar .stat-val{color:#94bce3 !important;}
+.score-bar .stat-lbl{color:#c7d4e2 !important;}
+.level-bar .stat-lbl{color:#c7d4e2 !important;}
+.word-chip{background:#16232f !important;color:#94bce3 !important;}
+.word-tile{color:#eef6ff !important;}
+.ch-btn.active{color:#eef6ff !important;}
 </style>
 
 </head>
@@ -1809,25 +1818,15 @@ function renderHome() {
   const container = document.getElementById('home-books');
   const OT = BOOKS.filter(b=>BOOK_META[b].t==='OT');
   const NT = BOOKS.filter(b=>BOOK_META[b].t==='NT');
-
-  function bookCard(b) {
-    const info = BOOK_INFO[b];
-    return `<div class="book-card${b===currentBook?' active':''}" id="book-card-${b}" onclick="setBook('${b}')">
-      <div class="b-icon">${info.icon}</div>
-      <h3>${b}</h3>
-      <p>${info.desc}</p>
-    </div>`;
-  }
-
+  const opt = b => '<option value="'+b+'"'+(b===currentBook?' selected':'')+'>'+b+'</option>';
   container.innerHTML =
-    '<div style="margin-bottom:0.5rem">'
-    +'<div class="testament-label"> Old Testament</div>'
-    +'<div class="book-picker">' + OT.map(bookCard).join('') + '</div>'
-    +'</div>'
-    +'<div>'
-    +'<div class="testament-label"> New Testament</div>'
-    +'<div class="book-picker">' + NT.map(bookCard).join('') + '</div>'
-    +'</div>';
+    '<select id="home-book-select" style="width:100%;max-width:440px;padding:0.7rem 0.9rem;font-size:1rem;" '
+    +'onchange="setBook(this.value);var d=document.getElementById(\'home-book-desc\');if(d)d.textContent=(BOOK_INFO[this.value]||{}).desc||\'\';">'
+    +'<optgroup label="New Testament">'+ NT.map(opt).join('') +'</optgroup>'
+    +'<optgroup label="Old Testament">'+ OT.map(opt).join('') +'</optgroup>'
+    +'</select>'
+    +'<p id="home-book-desc" style="margin-top:0.6rem;color:var(--text-muted);font-size:0.8rem;font-family:var(--font-heading);text-transform:uppercase;letter-spacing:.06em">'
+    + ((BOOK_INFO[currentBook]||{}).desc||'') +'</p>';
   updateHomeDevoSummary();
 }
 
